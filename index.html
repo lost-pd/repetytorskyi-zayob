@@ -185,6 +185,10 @@ select option{background:var(--bg);}
     <div class="tab" onclick="switchPaymentTab('list',this)">По учнях</div>
   </div>
   <div id="payment-stats-section">
+    <div style="margin-bottom:12px">
+      <button class="secondary" style="width:100%;font-size:13px" onclick="showDiagnostics()">🔍 Діагностика (для розробника)</button>
+      <div id="diag-output" style="margin-top:8px;font-size:11px;font-family:monospace;background:var(--bg3);padding:10px;border-radius:var(--r-md);white-space:pre-wrap;display:none;word-break:break-all"></div>
+    </div>
     <div class="tabs" id="stats-period-tabs" style="margin-bottom:12px">
       <div class="tab active" onclick="switchStatsPeriod('month',this)">Цей місяць</div>
       <div class="tab" onclick="switchStatsPeriod('year',this)">Цей рік</div>
@@ -995,6 +999,29 @@ function savePayment(){
   if(type==='Абонемент'){p.lessonsTotal=lessonsCount;p.lessonsLeft=lessonsCount;p.amountLeft=amount;}
   state.payments.push(p);save();closeModal('modal-add-payment');renderPayments();
   document.getElementById('p-amount').value='';document.getElementById('p-lessons-count').value='';
+}
+
+// ── DIAGNOSTICS ──────────────────────────────────────────
+function showDiagnostics(){
+  const el=document.getElementById('diag-output');
+  el.style.display=el.style.display==='none'?'block':'none';
+  if(el.style.display==='none')return;
+  let out='';
+  state.students.filter(s=>!s.archived).forEach(s=>{
+    const done=state.lessons.filter(l=>l.studentId===s.id&&l.status==='done');
+    const pmts=state.payments.filter(p=>p.studentId===s.id&&p.status==='Оплачено');
+    const totalPaid=pmts.reduce((a,p)=>a+(p.amount||0),0);
+    const balance=totalPaid-done.length*(s.price||0);
+    out+=`\n=== ${s.name} (ціна: ${s.price}₴) ===\n`;
+    out+=`Проведено уроків: ${done.length}\n`;
+    out+=`Разом сплачено: ${totalPaid}₴\n`;
+    out+=`Баланс: ${balance}₴\n`;
+    out+=`Уроки:\n`;
+    done.forEach(l=>out+=`  ${l.date} paid=${l.paid} autoId=${l.autoPaymentId?'так':'ні'}\n`);
+    out+=`Оплати:\n`;
+    pmts.forEach(p=>out+=`  ${p.date} ${p.amount}₴ ${p.type}\n`);
+  });
+  el.textContent=out;
 }
 
 // ── INIT ─────────────────────────────────────────────────
