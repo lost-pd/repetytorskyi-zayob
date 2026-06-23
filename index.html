@@ -403,13 +403,9 @@ function recalculateSubscriptions() {
   state.payments.filter(p=>p.type==='Абонемент'&&p.status==='Оплачено'&&p.lessonsTotal>0).forEach(sub=>{
     const subDateN=dateToNum(sub.date||'01.01.2000');
     
-    // Рахуємо тільки ті уроки, які:
-    // 1. Належать цьому учню і мають статус 'done'
-    // 2. Відбулися в день купівлі абонемента або пізніше
-    // 3. НЕ є безкоштовними (isFree) і НЕ мають окремого автоплатежу (autoPaymentId)
     const used=state.lessons.filter(l=>
       l.studentId===sub.studentId&&
-      l.status==='done'&&
+      (l.status==='done' || (l.status==='cancelled' && l.paid)) && // ОНОВЛЕНО: рахуємо або проведені, або скасовані, але помічені як "оплачені"
       dateToNum(l.date)>=subDateN&&
       !l.autoPaymentId&&
       !l.isFree
@@ -420,7 +416,6 @@ function recalculateSubscriptions() {
     sub.amountLeft=Math.max(0,sub.lessonsLeft*ppl);
   });
 }
-
 (function cleanPast(){
   const todayN=dateToNum(today());
   state.lessons=state.lessons.filter(l=>{
