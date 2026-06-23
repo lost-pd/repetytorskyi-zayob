@@ -55,6 +55,7 @@ button.danger-btn{background:var(--danger-bg);color:var(--danger);border:none;pa
 .badge-warn{background:var(--warn-bg);color:var(--warn);}
 .badge-red{background:var(--danger-bg);color:var(--danger);}
 .badge-gray{background:var(--bg3);color:var(--text2);}
+.badge-cancel{background:var(--danger-bg);color:var(--danger);}
 .row-between{display:flex;align-items:center;justify-content:space-between;}
 .form-group{margin-bottom:14px;}
 .form-label{font-size:13px;color:var(--text2);margin-bottom:5px;display:block;}
@@ -69,6 +70,7 @@ button.danger-btn{background:var(--danger-bg);color:var(--danger);border:none;pa
 .lesson-row{display:flex;align-items:flex-start;gap:10px;padding:12px 0;border-bottom:0.5px solid var(--border);}
 .lesson-row:last-child{border-bottom:none;}
 .lesson-time{font-size:13px;color:var(--text2);min-width:44px;flex-shrink:0;padding-top:2px;}
+.status-btn{font-size:20px;background:none;border:none;cursor:pointer;padding:2px;line-height:1;flex-shrink:0;}
 .action-btn{display:inline-flex;align-items:center;gap:4px;font-size:12px;padding:4px 10px;border-radius:var(--r-md);border:0.5px solid var(--border2);background:var(--bg2);color:var(--text2);cursor:pointer;white-space:nowrap;}
 .action-btn.done{background:var(--accent-bg);color:var(--accent-text);border-color:var(--accent);}
 .action-btn.paid-done{background:var(--info-bg);color:var(--info);border-color:var(--info);}
@@ -90,6 +92,12 @@ select option{background:var(--bg);}
 .bal-pos{color:var(--accent);}
 .bal-neg{color:var(--danger);}
 .top-action{display:flex;justify-content:flex-end;margin-bottom:12px;}
+.student-chip{display:inline-flex;align-items:center;gap:4px;font-size:11px;padding:3px 8px;border-radius:20px;border:0.5px solid var(--border2);background:var(--bg2);color:var(--text2);margin-right:4px;margin-bottom:4px;}
+.student-chip.checked{background:var(--accent-bg);color:var(--accent-text);border-color:var(--accent);}
+.topic-select-list{max-height:240px;overflow-y:auto;border:0.5px solid var(--border2);border-radius:var(--r-md);background:var(--bg2);}
+.topic-option{padding:10px 14px;cursor:pointer;font-size:14px;border-bottom:0.5px solid var(--border);}
+.topic-option:last-child{border-bottom:none;}
+.topic-option:hover,.topic-option.selected{background:var(--accent-bg);color:var(--accent-text);}
 </style>
 </head>
 <body>
@@ -216,7 +224,7 @@ select option{background:var(--bg);}
   <div class="form-group"><label class="form-label">Вартість уроку (₴)</label><input type="number" id="s-price" placeholder="500"></div>
   <div class="form-group">
     <label class="form-label">Тип розкладу</label>
-    <div class="pill-row" id="s-schedule-pills">
+    <div class="pill-row" id="s-sched-pills">
       <div class="pill selected" onclick="selectPill(this,'s-sched')">Регулярний</div>
       <div class="pill" onclick="selectPill(this,'s-sched')">Гнучкий</div>
     </div>
@@ -290,7 +298,7 @@ select option{background:var(--bg);}
 <!-- MODAL: ADD LESSON -->
 <div class="modal-overlay" id="modal-add-lesson"><div class="modal">
   <div class="modal-title">Новий урок</div>
-  <div class="form-group"><label class="form-label">Учень</label><select id="l-student"></select></div>
+  <div class="form-group"><label class="form-label">Учень</label><select id="l-student" onchange="updateLessonTopicList()"></select></div>
   <div class="form-group"><label class="form-label">Дата</label><input type="text" id="l-date" placeholder="дд.мм.рррр"></div>
   <div class="form-group"><label class="form-label">Час</label><input type="text" id="l-time" placeholder="10:00"></div>
   <div class="form-group">
@@ -301,7 +309,11 @@ select option{background:var(--bg);}
       <div class="pill" onclick="selectPill(this,'l-dur')">90</div>
     </div>
   </div>
-  <div class="form-group"><label class="form-label">Тема</label><input type="text" id="l-topic" placeholder="Наприклад: Akuzativ singuláru"></div>
+  <div class="form-group">
+    <label class="form-label">Тема (необов'язково)</label>
+    <div id="l-topic-list" class="topic-select-list"></div>
+    <input type="hidden" id="l-topic-val">
+  </div>
   <button class="primary" onclick="saveLesson()">Зберегти</button>
   <button class="ghost" style="width:100%;text-align:center;margin-top:12px" onclick="closeModal('modal-add-lesson')">Скасувати</button>
 </div></div>
@@ -346,23 +358,30 @@ select option{background:var(--bg);}
   <button class="ghost" style="width:100%;text-align:center;margin-top:16px" onclick="closeModal('modal-student-detail')">Закрити</button>
 </div></div>
 
+<!-- MODAL: PICK TOPIC -->
+<div class="modal-overlay" id="modal-pick-topic"><div class="modal">
+  <div class="modal-title">Вибрати тему уроку</div>
+  <input type="hidden" id="pt-lesson-id">
+  <div id="pt-topic-list" class="topic-select-list" style="max-height:320px"></div>
+  <button class="ghost" style="width:100%;text-align:center;margin-top:16px" onclick="closeModal('modal-pick-topic')">Скасувати</button>
+</div></div>
+
 <script>
 // ── STATE ──────────────────────────────────────────────────
-let state = {students:[],lessons:[],payments:[],topics:{A1:[],A2:[],B1:[],B2:[]}};
-let currentTopicLevel='A1', currentStudentTab='active', currentStatsPeriod='month', currentPaymentTab='stats';
+let state={students:[],lessons:[],payments:[],topics:{A1:[],A2:[],B1:[],B2:[]}};
+let currentTopicLevel='A1',currentStudentTab='active',currentStatsPeriod='month',currentPaymentTab='stats';
 
 function save(){localStorage.setItem('czech_tutor_v1',JSON.stringify(state));}
 function load(){const d=localStorage.getItem('czech_tutor_v1');if(d)state=JSON.parse(d);}
 load();
 
-// On load: remove all auto-generated past regular lessons that were never touched
-(function cleanPastRegular(){
-  const todayN = dateToNum(today());
-  state.lessons = state.lessons.filter(l => {
-    if (!l.isRegular) return true;
-    if (dateToNum(l.date) >= todayN) return true;
-    // keep past regular lessons only if they were acted upon
-    return l.done || l.notionDone || l.paid || l.topic;
+// Clean untouched past regular lessons on load
+(function cleanPast(){
+  const todayN=dateToNum(today());
+  state.lessons=state.lessons.filter(l=>{
+    if(!l.isRegular)return true;
+    if(dateToNum(l.date)>=todayN)return true;
+    return l.status==='done'||l.status==='cancelled'||l.notionDone||l.paid||l.topic;
   });
   save();
 })();
@@ -371,19 +390,63 @@ load();
 function today(){const d=new Date();return pad(d.getDate())+'.'+pad(d.getMonth()+1)+'.'+d.getFullYear();}
 function pad(n){return n<10?'0'+n:''+n;}
 function initials(name){return name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);}
+function firstName(name){return name.split(' ')[0];}
 function getStudent(id){return state.students.find(s=>s.id===id);}
 function dateToNum(d){if(!d)return 0;const p=d.split('.');if(p.length<3)return 0;return parseInt(p[2]+p[1]+p[0]);}
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
 function dateInMonth(ds,y,m){if(!ds)return false;const p=ds.split('.');return p.length>=3&&parseInt(p[2])===y&&parseInt(p[1])===m;}
 function dateInYear(ds,y){if(!ds)return false;const p=ds.split('.');return p.length>=3&&parseInt(p[2])===y;}
+function getActiveSub(sid){return state.payments.find(p=>p.studentId===sid&&p.type==='Абонемент'&&p.status==='Оплачено'&&p.lessonsLeft>0);}
+
+// lesson status helpers
+function statusEmoji(l){
+  if(l.status==='done')return'✅';
+  if(l.status==='cancelled')return'❌';
+  return'📅';
+}
+function statusBadge(l){
+  if(l.status==='done')return'<span class="badge badge-green">✅ Проведено</span>';
+  if(l.status==='cancelled')return'<span class="badge badge-cancel">❌ Скасовано</span>';
+  return'<span class="badge badge-gray">📅 Заплановано</span>';
+}
+function cycleStatus(id){
+  const l=state.lessons.find(x=>x.id===id);if(!l)return;
+  const cur=l.status||'planned';
+  if(cur==='planned'){
+    // mark done: deduct from subscription
+    const st=getStudent(l.studentId);
+    const sub=st?getActiveSub(st.id):null;
+    if(sub){
+      sub.lessonsLeft=Math.max(0,sub.lessonsLeft-1);
+      const ppl=sub.lessonsTotal>0?Math.round(sub.amount/sub.lessonsTotal):0;
+      sub.amountLeft=Math.max(0,(sub.amountLeft!==undefined?sub.amountLeft:sub.amount)-ppl);
+    }
+    l.status='done';
+  } else if(cur==='done'){
+    // undo done: restore subscription
+    const st=getStudent(l.studentId);
+    const sub=st?getActiveSub(st.id):null;
+    if(sub){
+      sub.lessonsLeft=Math.min(sub.lessonsTotal||999,sub.lessonsLeft+1);
+      const ppl=sub.lessonsTotal>0?Math.round(sub.amount/sub.lessonsTotal):0;
+      sub.amountLeft=Math.min(sub.amount,(sub.amountLeft||0)+ppl);
+    }
+    l.status='cancelled';
+  } else {
+    l.status='planned';
+  }
+  // keep legacy .done in sync
+  l.done=l.status==='done';
+  save();renderSchedule();
+}
 
 const DAY_MAP={'Пн':1,'Вт':2,'Ср':3,'Чт':4,'Пт':5,'Сб':6,'Нд':0};
 
 function syncRegularLessons(){
-  const todayN = dateToNum(today());
+  const now=new Date();
   state.students.filter(s=>!s.archived&&s.schedule==='Регулярний'&&s.days&&s.days.length).forEach(student=>{
-    const end=new Date(); end.setDate(end.getDate()+84);
-    const cur=new Date();
+    const end=new Date();end.setDate(end.getDate()+84);
+    const cur=new Date(now);
     while(cur<=end){
       const dow=cur.getDay();
       const dayName=Object.keys(DAY_MAP).find(k=>DAY_MAP[k]===dow);
@@ -392,7 +455,7 @@ function syncRegularLessons(){
         const exists=state.lessons.find(l=>l.studentId===student.id&&l.date===dateStr&&l.isRegular);
         if(!exists){
           state.lessons.push({id:uid(),studentId:student.id,date:dateStr,time:student.time||'',
-            topic:'',duration:student.duration||60,done:false,notionDone:false,paid:false,isRegular:true});
+            topic:'',duration:student.duration||60,status:'planned',done:false,notionDone:false,paid:false,isRegular:true});
         }
       }
       cur.setDate(cur.getDate()+1);
@@ -403,20 +466,42 @@ function syncRegularLessons(){
 
 // ── MODALS ─────────────────────────────────────────────────
 function openModal(id){
-  if(id==='modal-add-lesson'||id==='modal-add-payment')fillStudentSelect(id);
-  if(id==='modal-add-lesson')document.getElementById('l-date').value=today();
-  if(id==='modal-add-payment'){document.getElementById('p-date').value=today();document.getElementById('p-sub-group').style.display='none';}
+  if(id==='modal-add-lesson'){fillStudentSelect('modal-add-lesson');document.getElementById('l-date').value=today();updateLessonTopicList();}
+  if(id==='modal-add-payment'){fillStudentSelect('modal-add-payment');document.getElementById('p-date').value=today();document.getElementById('p-sub-group').style.display='none';}
   document.getElementById(id).classList.add('open');
 }
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 document.querySelectorAll('.modal-overlay').forEach(el=>{
   el.addEventListener('click',e=>{if(e.target===el)el.classList.remove('open');});
 });
+
 function fillStudentSelect(modalId){
   const sid=modalId==='modal-add-lesson'?'l-student':'p-student';
   const sel=document.getElementById(sid);
   const active=state.students.filter(s=>!s.archived);
   sel.innerHTML=active.length?active.map(s=>`<option value="${s.id}">${s.name} (${(s.levels||[s.level]).join('+')})</option>`).join(''):'<option value="">— немає учнів —</option>';
+}
+
+// Build topic list for lesson modal
+function updateLessonTopicList(){
+  const sid=document.getElementById('l-student').value;
+  const container=document.getElementById('l-topic-list');
+  document.getElementById('l-topic-val').value='';
+  container.querySelectorAll('.topic-option').forEach(o=>o.classList.remove('selected'));
+  if(!sid){container.innerHTML='<div style="padding:10px 14px;color:var(--text3);font-size:13px">Спочатку вибери учня</div>';return;}
+  const st=getStudent(sid);
+  if(!st){return;}
+  const levels=st.levels||[st.level];
+  const allTopics=[];
+  levels.forEach(lv=>{(state.topics[lv]||[]).forEach(t=>allTopics.push({name:t.name,level:lv}));});
+  if(!allTopics.length){container.innerHTML='<div style="padding:10px 14px;color:var(--text3);font-size:13px">Тем ще немає</div>';return;}
+  container.innerHTML=allTopics.map((t,i)=>`<div class="topic-option" data-idx="${i}" data-name="${t.name}" onclick="selectLessonTopic(this,'l-topic-val','l-topic-list')">[${t.level}] ${t.name}</div>`).join('');
+}
+
+function selectLessonTopic(el,valId,listId){
+  document.getElementById(listId).querySelectorAll('.topic-option').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById(valId).value=el.dataset.name;
 }
 
 // ── PILLS ─────────────────────────────────────────────────
@@ -449,10 +534,11 @@ function showPage(name,btn){
 
 // ── SCHEDULE ──────────────────────────────────────────────
 function renderSchedule(){
-  const tod=today(), todayN=dateToNum(tod);
-  const todayL=state.lessons.filter(l=>l.date===tod).sort((a,b)=>a.time.localeCompare(b.time));
+  const tod=today(),todayN=dateToNum(tod);
+  const todayL=state.lessons.filter(l=>l.date===tod).sort((a,b)=>(a.time||'').localeCompare(b.time||''));
   const upcoming=state.lessons.filter(l=>dateToNum(l.date)>todayN).sort((a,b)=>dateToNum(a.date)-dateToNum(b.date)).slice(0,10);
-  const past=state.lessons.filter(l=>dateToNum(l.date)<todayN&&(l.done||l.notionDone||l.paid||l.topic||!l.isRegular)).sort((a,b)=>dateToNum(b.date)-dateToNum(a.date)).slice(0,15);
+  const past=state.lessons.filter(l=>dateToNum(l.date)<todayN&&(l.status==='done'||l.status==='cancelled'||l.notionDone||l.paid||l.topic||!l.isRegular))
+    .sort((a,b)=>dateToNum(b.date)-dateToNum(a.date)).slice(0,15);
 
   document.getElementById('stat-today').textContent=todayL.length;
   const weekN=todayN+7;
@@ -469,50 +555,103 @@ function lessonRow(l){
   const name=st?st.name:'?';
   const sub=st?getActiveSub(st.id):null;
   const subInfo=sub?`<span style="font-size:11px;color:var(--info)">Абон: ${sub.lessonsLeft}ур/${sub.amountLeft||0}₴</span>`:'';
-  return `<div class="lesson-row" onclick="openLessonDetail('${l.id}')">
-    <div class="lesson-time">${l.time||'--:--'}<br><span style="font-size:11px;color:var(--text3)">${l.date||''}</span></div>
-    <div style="flex:1;min-width:0">
-      <div style="font-weight:500;font-size:15px">${name}</div>
+  const status=l.status||'planned';
+  return `<div class="lesson-row">
+    <button class="status-btn" title="Змінити статус" onclick="cycleStatus('${l.id}')">${statusEmoji(l)}</button>
+    <div style="flex:1;min-width:0;cursor:pointer" onclick="openLessonDetail('${l.id}')">
+      <div style="display:flex;align-items:baseline;gap:6px">
+        <span style="font-weight:500;font-size:15px">${name}</span>
+        <span style="font-size:12px;color:var(--text3)">${l.time||''} ${l.date||''}</span>
+      </div>
       <div style="font-size:13px;color:var(--text2)">${l.topic||'Без теми'} · ${l.duration||60}хв</div>
       ${subInfo}
     </div>
     <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px">
-      <span class="badge ${l.done?'badge-green':'badge-gray'}">${l.done?'✓':'Заплан.'}</span>
-      <span class="action-btn ${l.notionDone?'done':''}" onclick="event.stopPropagation();toggleNotion('${l.id}')">${l.notionDone?'✓ Notion':'📎 Notion'}</span>
-      <span class="action-btn ${l.paid?'paid-done':''}" onclick="event.stopPropagation();togglePaidLesson('${l.id}')">${l.paid?'✓ Оплач.':'💳 Оплач.'}</span>
+      <span class="action-btn ${l.notionDone?'done':''}" onclick="toggleNotion('${l.id}')">${l.notionDone?'✓ Notion':'📎 Notion'}</span>
+      <span class="action-btn ${l.paid?'paid-done':''}" onclick="togglePaidLesson('${l.id}')">${l.paid?'✓ Оплач.':'💳 Оплач.'}</span>
     </div>
   </div>`;
 }
-
-function getActiveSub(sid){return state.payments.find(p=>p.studentId===sid&&p.type==='Абонемент'&&p.status==='Оплачено'&&p.lessonsLeft>0);}
 
 function openLessonDetail(id){
   const l=state.lessons.find(x=>x.id===id);if(!l)return;
   const st=getStudent(l.studentId);
   const name=st?st.name:'?';
   const sub=st?getActiveSub(st.id):null;
+  const levels=st?st.levels||[st.level]:[];
+  const allTopics=[];
+  levels.forEach(lv=>{(state.topics[lv]||[]).forEach(t=>allTopics.push({name:t.name,level:lv}));});
+
+  const topicHtml=allTopics.length
+    ?`<div class="topic-select-list" style="max-height:180px">${allTopics.map(t=>`<div class="topic-option ${l.topic===t.name?'selected':''}" onclick="setLessonTopic('${id}','${t.name.replace(/'/g,"\\'")}',this)">[${t.level}] ${t.name}</div>`).join('')}</div>`
+    :`<span style="color:var(--text3);font-size:13px">Тем ще немає</span>`;
+
   document.getElementById('lesson-detail-content').innerHTML=`
     <div class="modal-title">Урок: ${name}</div>
-    <div class="card">
+    <div class="card" style="margin-bottom:12px">
+      <div class="row-between" style="margin-bottom:8px"><span style="color:var(--text2);font-size:13px">Статус</span>
+        <div style="display:flex;gap:8px">
+          <button class="status-btn" style="font-size:22px" onclick="setLessonStatus('${id}','done');rerenderDetail('${id}')" title="Проведено">✅</button>
+          <button class="status-btn" style="font-size:22px" onclick="setLessonStatus('${id}','planned');rerenderDetail('${id}')" title="Заплановано">📅</button>
+          <button class="status-btn" style="font-size:22px" onclick="setLessonStatus('${id}','cancelled');rerenderDetail('${id}')" title="Скасовано">❌</button>
+        </div>
+      </div>
       <div class="row-between" style="margin-bottom:8px"><span style="color:var(--text2);font-size:13px">Дата і час</span><span style="font-weight:500">${l.date} ${l.time}</span></div>
       <div class="row-between" style="margin-bottom:8px"><span style="color:var(--text2);font-size:13px">Тривалість</span><span>${l.duration||60} хв</span></div>
-      <div class="row-between" style="margin-bottom:8px"><span style="color:var(--text2);font-size:13px">Тема</span><span>${l.topic||'—'}</span></div>
       ${sub?`<div class="row-between" style="margin-bottom:8px"><span style="color:var(--text2);font-size:13px">Абонемент</span><span style="color:var(--info)">${sub.lessonsLeft} ур. / ${sub.amountLeft||0}₴</span></div>`:''}
       <div class="row-between" style="margin-bottom:8px"><span style="color:var(--text2);font-size:13px">Notion</span>
-        <span class="action-btn ${l.notionDone?'done':''}" onclick="toggleNotion('${l.id}');rerenderDetail('${l.id}')">${l.notionDone?'✓ Завантажено':'📎 Завантажити'}</span></div>
+        <span class="action-btn ${l.notionDone?'done':''}" onclick="toggleNotion('${id}');rerenderDetail('${id}')">${l.notionDone?'✓ Завантажено':'📎 Завантажити'}</span></div>
       <div class="row-between"><span style="color:var(--text2);font-size:13px">Оплата</span>
-        <span class="action-btn ${l.paid?'paid-done':''}" onclick="togglePaidLesson('${l.id}');rerenderDetail('${l.id}')">${l.paid?'✓ Оплачено':'💳 Оплатити'}</span></div>
+        <span class="action-btn ${l.paid?'paid-done':''}" onclick="togglePaidLesson('${id}');rerenderDetail('${id}')">${l.paid?'✓ Оплачено':'💳 Оплатити'}</span></div>
     </div>
-    <div style="display:flex;gap:8px;margin-top:8px">
-      <button class="secondary" style="flex:1" onclick="toggleLessonDone('${l.id}');rerenderDetail('${l.id}')">${l.done?'↩ Відмінити':'✓ Проведено'}</button>
-      <button class="danger-btn" onclick="deleteLesson('${l.id}')">Видалити</button>
+    <div class="form-label" style="margin-bottom:6px">Тема уроку ${l.topic?'<span class="badge badge-green">'+l.topic+'</span>':''}</div>
+    ${topicHtml}
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <button class="danger-btn" style="flex:1" onclick="deleteLesson('${id}')">Видалити урок</button>
     </div>`;
   openModal('modal-lesson-detail');
 }
+
+function setLessonTopic(lessonId, topicName, el){
+  const l=state.lessons.find(x=>x.id===lessonId);if(!l)return;
+  if(l.topic===topicName){l.topic='';el.classList.remove('selected');}
+  else{
+    l.topic=topicName;
+    el.closest('.topic-select-list').querySelectorAll('.topic-option').forEach(o=>o.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+  save();
+  // update badge in header without closing modal
+  const badge=document.querySelector('#lesson-detail-content .form-label .badge');
+  const label=document.querySelector('#lesson-detail-content .form-label');
+  if(label){
+    label.innerHTML=`Тема уроку ${l.topic?'<span class="badge badge-green">'+l.topic+'</span>':''}`;
+  }
+}
+
+function setLessonStatus(id,status){
+  const l=state.lessons.find(x=>x.id===id);if(!l)return;
+  const prev=l.status||'planned';
+  const st=getStudent(l.studentId);
+  const sub=st?getActiveSub(st.id):null;
+  // undo previous done
+  if(prev==='done'&&status!=='done'&&sub){
+    sub.lessonsLeft=Math.min(sub.lessonsTotal||999,sub.lessonsLeft+1);
+    const ppl=sub.lessonsTotal>0?Math.round(sub.amount/sub.lessonsTotal):0;
+    sub.amountLeft=Math.min(sub.amount,(sub.amountLeft||0)+ppl);
+  }
+  // apply new done
+  if(status==='done'&&prev!=='done'&&sub){
+    sub.lessonsLeft=Math.max(0,sub.lessonsLeft-1);
+    const ppl=sub.lessonsTotal>0?Math.round(sub.amount/sub.lessonsTotal):0;
+    sub.amountLeft=Math.max(0,(sub.amountLeft!==undefined?sub.amountLeft:sub.amount)-ppl);
+  }
+  l.status=status;l.done=status==='done';
+  save();renderSchedule();
+}
+
 function rerenderDetail(id){closeModal('modal-lesson-detail');renderSchedule();setTimeout(()=>openLessonDetail(id),50);}
-
 function toggleNotion(id){const l=state.lessons.find(x=>x.id===id);if(l){l.notionDone=!l.notionDone;save();renderSchedule();}}
-
 function togglePaidLesson(id){
   const l=state.lessons.find(x=>x.id===id);if(!l)return;
   const st=getStudent(l.studentId);if(!st)return;
@@ -526,40 +665,17 @@ function togglePaidLesson(id){
   }
   save();renderSchedule();
 }
-
-function toggleLessonDone(id){
-  const l=state.lessons.find(x=>x.id===id);if(!l)return;
-  const st=getStudent(l.studentId);
-  if(!l.done){
-    const sub=st?getActiveSub(st.id):null;
-    if(sub){
-      sub.lessonsLeft=Math.max(0,sub.lessonsLeft-1);
-      const ppl=sub.lessonsTotal>0?Math.round(sub.amount/sub.lessonsTotal):0;
-      sub.amountLeft=Math.max(0,(sub.amountLeft!==undefined?sub.amountLeft:sub.amount)-ppl);
-    }
-  } else {
-    const sub=st?getActiveSub(st.id):null;
-    if(sub){
-      sub.lessonsLeft=Math.min(sub.lessonsTotal||999,sub.lessonsLeft+1);
-      const ppl=sub.lessonsTotal>0?Math.round(sub.amount/sub.lessonsTotal):0;
-      sub.amountLeft=Math.min(sub.amount,(sub.amountLeft||0)+ppl);
-    }
-  }
-  l.done=!l.done;save();renderSchedule();
-}
-
 function deleteLesson(id){state.lessons=state.lessons.filter(x=>x.id!==id);save();closeModal('modal-lesson-detail');renderSchedule();}
-
 function saveLesson(){
   const sid=document.getElementById('l-student').value;
   const date=document.getElementById('l-date').value.trim();
   const time=document.getElementById('l-time').value.trim();
-  const topic=document.getElementById('l-topic').value.trim();
+  const topic=document.getElementById('l-topic-val').value.trim();
   const dur=getPill('l-dur-pills')||'60';
   if(!sid||!date){alert('Вибери учня і вкажи дату');return;}
-  state.lessons.push({id:uid(),studentId:sid,date,time,topic,duration:parseInt(dur),done:false,notionDone:false,paid:false,isRegular:false});
+  state.lessons.push({id:uid(),studentId:sid,date,time,topic,duration:parseInt(dur),status:'planned',done:false,notionDone:false,paid:false,isRegular:false});
   save();closeModal('modal-add-lesson');renderSchedule();
-  document.getElementById('l-time').value='';document.getElementById('l-topic').value='';
+  document.getElementById('l-time').value='';document.getElementById('l-topic-val').value='';
 }
 
 // ── STUDENTS ─────────────────────────────────────────────
@@ -582,7 +698,7 @@ function renderStudents(){
     const pct=levels.reduce((acc,lv)=>{const t=state.topics[lv]||[];if(!t.length)return acc;return{done:acc.done+t.filter(x=>(x.doneBy||[]).includes(s.id)).length,total:acc.total+t.length};},{done:0,total:0});
     const pctVal=pct.total?Math.round(pct.done/pct.total*100):0;
     const topicsLabel=levels.map(lv=>{const t=state.topics[lv]||[];const d=t.filter(x=>(x.doneBy||[]).includes(s.id)).length;return t.length?`${lv}: ${d}/${t.length}`:null;}).filter(Boolean).join(' · ');
-    return `<div class="card" onclick="openStudentDetail('${s.id}')">
+    return`<div class="card" onclick="openStudentDetail('${s.id}')">
       <div style="display:flex;align-items:center;gap:12px">
         <div class="avatar">${initials(s.name)}</div>
         <div style="flex:1">
@@ -602,9 +718,8 @@ function renderStudents(){
 function openStudentDetail(id){
   const s=getStudent(id);if(!s)return;
   const levels=s.levels||[s.level];
-  const doneLessons=state.lessons.filter(l=>l.studentId===id&&l.done);
+  const doneLessons=state.lessons.filter(l=>l.studentId===id&&l.status==='done');
   const paidTotal=state.payments.filter(p=>p.studentId===id&&p.status==='Оплачено').reduce((a,p)=>a+(p.amount||0),0);
-  const debtTotal=state.payments.filter(p=>p.studentId===id&&p.status==='Очікує').reduce((a,p)=>a+(p.amount||0),0);
   const balance=paidTotal-doneLessons.length*(s.price||0);
   const sub=getActiveSub(id);
   const nextTopicsHtml=levels.map(lv=>{
@@ -634,7 +749,7 @@ function openStudentDetail(id){
     ${nextTopicsHtml}
     ${s.notes?`<div class="card" style="margin-bottom:12px"><div style="font-size:13px;color:var(--text2);margin-bottom:6px">Нотатки</div>${s.notes}</div>`:''}
     <div class="section-title" style="margin-top:0">Проведені уроки (${doneLessons.length})</div>
-    <div class="card">${doneLessons.length?doneLessons.sort((a,b)=>dateToNum(b.date)-dateToNum(a.date)).slice(0,8).map(l=>`<div class="check-row"><div style="flex:1"><div style="font-size:14px;font-weight:500">${l.date} ${l.time}</div><div style="font-size:13px;color:var(--text2)">${l.topic||'Без теми'}</div></div><span class="badge badge-green">✓</span></div>`).join(''):'<div style="color:var(--text3);font-size:14px;padding:8px 0">Проведених уроків ще немає</div>'}</div>`;
+    <div class="card">${doneLessons.length?doneLessons.sort((a,b)=>dateToNum(b.date)-dateToNum(a.date)).slice(0,8).map(l=>`<div class="check-row"><div style="flex:1"><div style="font-size:14px;font-weight:500">${l.date} ${l.time}</div><div style="font-size:13px;color:var(--text2)">${l.topic||'Без теми'}</div></div><span class="badge badge-green">✅</span></div>`).join(''):'<div style="color:var(--text3);font-size:14px;padding:8px 0">Проведених уроків ще немає</div>'}</div>`;
   openModal('modal-student-detail');
 }
 
@@ -644,9 +759,7 @@ function toggleArchive(id){
   if(s.archived){
     const todayN=dateToNum(today());
     state.lessons=state.lessons.filter(l=>!(l.studentId===id&&l.isRegular&&dateToNum(l.date)>=todayN));
-  } else {
-    syncRegularLessons();
-  }
+  } else {syncRegularLessons();}
   save();closeModal('modal-student-detail');renderStudents();
 }
 
@@ -732,12 +845,13 @@ function renderTopics(){
     <div style="flex:1;min-width:0"><div style="font-size:15px">${t.name}</div>
       ${studentsAtLevel.length?`<div style="font-size:12px;color:var(--text3);margin-top:2px">${(t.doneBy||[]).length}/${studentsAtLevel.length} учнів</div>`:''}
     </div>
-    <div style="display:flex;align-items:center;gap:6px">
-      ${studentsAtLevel.map(s=>`<div title="${s.name}" onclick="toggleTopicDone('${currentTopicLevel}',${idx},'${s.id}')"
-        style="width:28px;height:28px;border-radius:50%;background:${(t.doneBy||[]).includes(s.id)?'var(--accent)':'var(--bg3)'};
-        display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:10px;font-weight:500;
-        color:${(t.doneBy||[]).includes(s.id)?'#fff':'var(--text3)'}">${initials(s.name)}</div>`).join('')}
-      <button class="ghost" style="color:var(--danger);font-size:18px;padding:0 4px" onclick="deleteTopic('${currentTopicLevel}',${idx})">×</button>
+    <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;justify-content:flex-end;max-width:140px">
+      ${studentsAtLevel.map(s=>{
+        const done=(t.doneBy||[]).includes(s.id);
+        return`<div title="${s.name}" onclick="toggleTopicDone('${currentTopicLevel}',${idx},'${s.id}')"
+          class="student-chip ${done?'checked':''}">${done?'✓':''} ${firstName(s.name)}</div>`;
+      }).join('')}
+      <button class="ghost" style="color:var(--danger);font-size:18px;padding:0 2px" onclick="deleteTopic('${currentTopicLevel}',${idx})">×</button>
     </div>
   </div>`).join('')+'</div>';
 }
@@ -773,11 +887,11 @@ function renderPayments(){
   if(currentStatsPeriod==='month'){
     document.getElementById('stats-period-label').textContent=`${pad(1)}.${pad(m)}.${y} — ${pad(new Date(y,m,0).getDate())}.${pad(m)}.${y}`;
     state.payments.forEach(p=>{if(!dateInMonth(p.date,y,m))return;if(p.status==='Оплачено')earned+=p.amount||0;else pending+=p.amount||0;});
-    lessonsDone=state.lessons.filter(l=>l.done&&dateInMonth(l.date,y,m)).length;
+    lessonsDone=state.lessons.filter(l=>l.status==='done'&&dateInMonth(l.date,y,m)).length;
   } else {
     document.getElementById('stats-period-label').textContent=`01.01.${y} — 31.12.${y}`;
     state.payments.forEach(p=>{if(!dateInYear(p.date,y))return;if(p.status==='Оплачено')earned+=p.amount||0;else pending+=p.amount||0;});
-    lessonsDone=state.lessons.filter(l=>l.done&&dateInYear(l.date,y)).length;
+    lessonsDone=state.lessons.filter(l=>l.status==='done'&&dateInYear(l.date,y)).length;
   }
   document.getElementById('stat-earned').textContent=earned.toLocaleString('uk')+' ₴';
   document.getElementById('stat-pending').textContent=pending.toLocaleString('uk')+' ₴';
@@ -788,10 +902,10 @@ function renderPayments(){
   const activeStudents=state.students.filter(s=>!s.archived);
   balEl.innerHTML=activeStudents.length?'<div class="card">'+activeStudents.map(s=>{
     const paidTotal=state.payments.filter(p=>p.studentId===s.id&&p.status==='Оплачено').reduce((a,p)=>a+(p.amount||0),0);
-    const done=state.lessons.filter(l=>l.studentId===s.id&&l.done).length;
+    const done=state.lessons.filter(l=>l.studentId===s.id&&l.status==='done').length;
     const balance=paidTotal-done*(s.price||0);
     const sub=getActiveSub(s.id);
-    return `<div class="check-row">
+    return`<div class="check-row">
       <div class="avatar" style="width:32px;height:32px;font-size:11px">${initials(s.name)}</div>
       <div style="flex:1"><div style="font-size:14px;font-weight:500">${s.name}</div>
         <div style="font-size:12px;color:var(--text2)">${done} уроків · ${paidTotal.toLocaleString('uk')}₴ сплачено</div>
