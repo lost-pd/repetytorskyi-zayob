@@ -802,18 +802,24 @@ function renderStudents(){
 }
 
 // ── BALANCE HELPER ────────────────────────────────────────
-// Balance = totalPaid - doneLessons * pricePerLesson
-// Simple and consistent. Free lessons add 0 to totalPaid, cost 0 per lesson (price=0 for that student).
-// Subscription is just a big payment. Each done lesson costs price regardless.
+// For each done lesson:
+//   - if it has autoPaymentId → cost = amount of that payment (could be 0₴)
+//   - if no autoPaymentId → cost = student price (covered by subscription or manual payment)
+// Balance = totalPaid - totalCost
 function calcBalance(studentId){
   const s=getStudent(studentId);if(!s)return 0;
   const totalPaid=state.payments
     .filter(p=>p.studentId===studentId&&p.status==='Оплачено')
     .reduce((a,p)=>a+(p.amount||0),0);
-  const doneLessons=state.lessons
-    .filter(l=>l.studentId===studentId&&l.status==='done')
-    .length;
-  return totalPaid - doneLessons*(s.price||0);
+  const doneLessons=state.lessons.filter(l=>l.studentId===studentId&&l.status==='done');
+  const totalCost=doneLessons.reduce((sum,l)=>{
+    if(l.autoPaymentId){
+      const pmt=state.payments.find(p=>p.id===l.autoPaymentId);
+      return sum+(pmt?pmt.amount:0);
+    }
+    return sum+(s.price||0);
+  },0);
+  return totalPaid - totalCost;
 }
 
 function openStudentDetail(id){
