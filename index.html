@@ -405,14 +405,19 @@ load();
     if(dateToNum(l.date)>=todayN)return true;
     return l.status==='done'||l.status==='cancelled'||l.notionDone||l.paid||l.topic;
   });
+  
   // Recalculate subscription counters based on actual done lessons
   state.payments.filter(p=>p.type==='Абонемент'&&p.status==='Оплачено'&&p.lessonsTotal>0).forEach(sub=>{
     const subDateN=dateToNum(sub.date||'01.01.2000');
+    
+    // ОНОВЛЕНО: Рахуємо тільки ті уроки, які дійсно мають списуватися з абонемента
     const used=state.lessons.filter(l=>
       l.studentId===sub.studentId&&
       l.status==='done'&&
-      dateToNum(l.date)>=subDateN
+      dateToNum(l.date)>=subDateN&&
+      !l.autoPaymentId // Ігноруємо уроки з власними платежами (наприклад, безкоштовні на 0 грн)
     ).length;
+    
     const ppl=Math.round(sub.amount/sub.lessonsTotal);
     sub.lessonsLeft=Math.max(0,sub.lessonsTotal-used);
     sub.amountLeft=Math.max(0,sub.lessonsLeft*ppl);
