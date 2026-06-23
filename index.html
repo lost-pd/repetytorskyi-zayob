@@ -398,6 +398,29 @@ function save(){localStorage.setItem('czech_tutor_v1',JSON.stringify(state));}
 function load(){const d=localStorage.getItem('czech_tutor_v1');if(d)state=JSON.parse(d);}
 load();
 
+// ОНОВЛЕНО: Надійна функція перерахунку абонементів
+function recalculateSubscriptions() {
+  state.payments.filter(p=>p.type==='Абонемент'&&p.status==='Оплачено'&&p.lessonsTotal>0).forEach(sub=>{
+    const subDateN=dateToNum(sub.date||'01.01.2000');
+    
+    // Рахуємо тільки ті уроки, які:
+    // 1. Належать цьому учню і мають статус 'done'
+    // 2. Відбулися в день купівлі абонемента або пізніше
+    // 3. НЕ є безкоштовними (isFree) і НЕ мають окремого автоплатежу (autoPaymentId)
+    const used=state.lessons.filter(l=>
+      l.studentId===sub.studentId&&
+      l.status==='done'&&
+      dateToNum(l.date)>=subDateN&&
+      !l.autoPaymentId&&
+      !l.isFree
+    ).length;
+    
+    const ppl=Math.round(sub.amount/sub.lessonsTotal);
+    sub.lessonsLeft=Math.max(0,sub.lessonsTotal-used);
+    sub.amountLeft=Math.max(0,sub.lessonsLeft*ppl);
+  });
+}
+
 (function cleanPast(){
   const todayN=dateToNum(today());
   state.lessons=state.lessons.filter(l=>{
@@ -405,23 +428,7 @@ load();
     if(dateToNum(l.date)>=todayN)return true;
     return l.status==='done'||l.status==='cancelled'||l.notionDone||l.paid||l.topic;
   });
-  
-  // Recalculate subscription counters based on actual done lessons
-  state.payments.filter(p=>p.type==='Абонемент'&&p.status==='Оплачено'&&p.lessonsTotal>0).forEach(sub=>{
-    const subDateN=dateToNum(sub.date||'01.01.2000');
-    
-    // ОНОВЛЕНО: Рахуємо тільки ті уроки, які дійсно мають списуватися з абонемента
-    const used=state.lessons.filter(l=>
-      l.studentId===sub.studentId&&
-      l.status==='done'&&
-      dateToNum(l.date)>=subDateN&&
-      !l.autoPaymentId // Ігноруємо уроки з власними платежами (наприклад, безкоштовні на 0 грн)
-    ).length;
-    
-    const ppl=Math.round(sub.amount/sub.lessonsTotal);
-    sub.lessonsLeft=Math.max(0,sub.lessonsTotal-used);
-    sub.amountLeft=Math.max(0,sub.lessonsLeft*ppl);
-  });
+  recalculateSubscriptions();
   save();
 })();
 
@@ -436,13 +443,14 @@ function dateToNum(d){if(!d)return 0;const p=d.split('.');if(p.length<3)return 0
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
 function dateInMonth(ds,y,m){if(!ds)return false;const p=ds.split('.');return p.length>=3&&parseInt(p[2])===y&&parseInt(p[1])===m;}
 function dateInYear(ds,y){if(!ds)return false;const p=ds.split('.');return p.length>=3&&parseInt(p[2])===y;}
+
+// Пошук абонемента тепер шукає той, де ще є уроки
 function getActiveSub(sid){
   return state.payments.find(p=>
     p.studentId===sid &&
     p.type==='Абонемент' &&
     p.status==='Оплачено' &&
-    p.lessonsLeft>0 &&
-    (p.amountLeft===undefined || p.amountLeft>0)
+    p.lessonsLeft>0
   );
 }
 function dateStrFromYMD(y,m,d){return pad(d)+'.'+pad(m)+'.'+y;}
@@ -477,7 +485,6 @@ function calNext(){
 function renderCalendar(){
   document.getElementById('cal-month-label').textContent=UA_MONTHS[calMonth-1]+' '+calYear;
 
-  // Build lesson map for this month: dateStr -> {done,planned,cancelled counts}
   const lessonMap={};
   state.lessons.forEach(l=>{
     if(!dateInMonth(l.date,calYear,calMonth))return;
@@ -488,7 +495,6 @@ function renderCalendar(){
 
   const firstDay=new Date(calYear,calMonth-1,1);
   const daysInMonth=new Date(calYear,calMonth,0).getDate();
-  // Monday=0 offset
   let startDow=firstDay.getDay()-1;
   if(startDow<0)startDow=6;
 
@@ -497,7 +503,6 @@ function renderCalendar(){
 
   let html=DOW.map(d=>`<div class="cal-dow">${d}</div>`).join('');
 
-  // empty cells before first day
   for(let i=0;i<startDow;i++) html+=`<div class="cal-day other-month"><span class="dn"></span></div>`;
 
   for(let d=1;d<=daysInMonth;d++){
@@ -546,7 +551,14 @@ function lessonRow(l){
   const st=getStudent(l.studentId);
   const name=st?st.name:'?';
   const sub=st?getActiveSub(st.id):null;
-  const subInfo=sub?`<span style="font-size:11px;color:var(--info)">Абон: ${sub.lessonsLeft}ур/${sub.amountLeft||0}₴</span>`:'';
+  
+  let subInfo='';
+  if (l.isFree) {
+    subInfo = `<span style="font-size:11px;color:var(--accent)">🎁 Безкоштовний урок</span>`;
+  } else if (sub) {
+    subInfo = `<span style="font-size:11px;color:var(--info)">Абон: ${sub.lessonsLeft}ур/${sub.amountLeft||0}₴</span>`;
+  }
+
   return `<div class="lesson-row">
     <button class="status-btn" title="Змінити статус" onclick="cycleStatus('${l.id}')">${statusEmoji(l)}</button>
     <div style="flex:1;min-width:0;cursor:pointer" onclick="openLessonDetail('${l.id}')">
@@ -559,7 +571,7 @@ function lessonRow(l){
     </div>
     <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px">
       <span class="action-btn ${l.notionDone?'done':''}" onclick="toggleNotion('${l.id}')">${l.notionDone?'✓ Notion':'📎 Notion'}</span>
-      <span class="action-btn ${l.paid?'paid-done':''}" onclick="togglePaidLesson('${l.id}')">${l.paid?'✓ Оплач.':'💳 Оплач.'}</span>
+      <span class="action-btn ${l.paid?'paid-done':''}" onclick="togglePaidLesson('${l.id}')">${l.paid?(l.autoPaymentId?'✓ Оплач.':'✓ З абон.'):'💳 Оплач.'}</span>
     </div>
   </div>`;
 }
@@ -567,26 +579,22 @@ function lessonRow(l){
 function cycleStatus(id){
   const l=state.lessons.find(x=>x.id===id);if(!l)return;
   const cur=l.status||'planned';
-  const st=getStudent(l.studentId);
-  const sub=st?getActiveSub(st.id):null;
-  if(cur==='planned'){
-    if(sub){
-      sub.lessonsLeft=Math.max(0,sub.lessonsLeft-1);
-      const ppl=sub.lessonsTotal>0?Math.round(sub.amount/sub.lessonsTotal):0;
-      sub.amountLeft=Math.max(0,(sub.amountLeft!==undefined?sub.amountLeft:sub.amount)-ppl);
-    }
-    l.status='done';
-  } else if(cur==='done'){
-    if(sub){
-      sub.lessonsLeft=Math.min(sub.lessonsTotal||999,sub.lessonsLeft+1);
-      const ppl=sub.lessonsTotal>0?Math.round(sub.amount/sub.lessonsTotal):0;
-      sub.amountLeft=Math.min(sub.amount,(sub.amountLeft||0)+ppl);
-    }
-    l.status='cancelled';
-  } else {
-    l.status='planned';
-  }
+  
+  if(cur==='planned') l.status='done';
+  else if(cur==='done') l.status='cancelled';
+  else l.status='planned';
+  
   l.done=l.status==='done';
+  
+  // Автоматично ставимо прапорець оплати з абонемента, якщо він є і це не безкоштовний урок
+  const sub=getActiveSub(l.studentId);
+  if(l.status==='done' && sub && !l.isFree && !l.autoPaymentId) {
+    l.paid = true;
+  } else if (l.status!=='done' && !l.autoPaymentId) {
+    l.paid = false;
+  }
+
+  recalculateSubscriptions();
   save();renderCalendar();
 }
 
@@ -612,13 +620,16 @@ function openLessonDetail(id){
           <button class="status-btn" style="font-size:22px;opacity:${(l.status||'planned')==='cancelled'?1:0.35}" onclick="setLessonStatus('${id}','cancelled');rerenderDetail('${id}')">❌</button>
         </div>
       </div>
+      <div class="row-between" style="margin-bottom:8px"><span style="color:var(--text2);font-size:13px">Тип уроку</span>
+        <span class="action-btn ${l.isFree?'done':''}" onclick="toggleFreeLesson('${id}');rerenderDetail('${id}')">${l.isFree?'🎁 Безкоштовний':'📖 Звичайний'}</span>
+      </div>
       <div class="row-between" style="margin-bottom:8px"><span style="color:var(--text2);font-size:13px">Дата і час</span><span style="font-weight:500">${l.date} ${l.time}</span></div>
       <div class="row-between" style="margin-bottom:8px"><span style="color:var(--text2);font-size:13px">Тривалість</span><span>${l.duration||60} хв</span></div>
       ${sub?`<div class="row-between" style="margin-bottom:8px"><span style="color:var(--text2);font-size:13px">Абонемент</span><span style="color:var(--info)">${sub.lessonsLeft} ур. / ${sub.amountLeft||0}₴</span></div>`:''}
       <div class="row-between" style="margin-bottom:8px"><span style="color:var(--text2);font-size:13px">Notion</span>
         <span class="action-btn ${l.notionDone?'done':''}" onclick="toggleNotion('${id}');rerenderDetail('${id}')">${l.notionDone?'✓ Завантажено':'📎 Завантажити'}</span></div>
       <div class="row-between"><span style="color:var(--text2);font-size:13px">Оплата</span>
-        <span class="action-btn ${l.paid?'paid-done':''}" onclick="togglePaidLesson('${id}');rerenderDetail('${id}')">${l.paid?'✓ Оплачено':'💳 Оплатити'}</span></div>
+        <span class="action-btn ${l.paid?'paid-done':''}" onclick="togglePaidLesson('${id}');rerenderDetail('${id}')">${l.paid?(l.autoPaymentId?'✓ Разова оплата':'✓ З абонемента'):'💳 Позначити оплату'}</span></div>
     </div>
     <div class="form-label" style="margin-bottom:6px" id="topic-label-${id}">Тема уроку ${l.topic?`<span class="badge badge-green">${l.topic}</span>`:''}</div>
     ${topicHtml}
@@ -626,6 +637,19 @@ function openLessonDetail(id){
       <button class="danger-btn" style="width:100%" onclick="deleteLesson('${id}')">Видалити урок</button>
     </div>`;
   openModal('modal-lesson-detail');
+}
+
+function toggleFreeLesson(id) {
+  const l=state.lessons.find(x=>x.id===id);if(!l)return;
+  l.isFree = !l.isFree;
+  if(l.isFree) {
+    if(l.autoPaymentId){state.payments=state.payments.filter(p=>p.id!==l.autoPaymentId);l.autoPaymentId=null;}
+    l.paid = true;
+  } else {
+    l.paid = (l.status === 'done');
+  }
+  recalculateSubscriptions();
+  save();renderCalendar();
 }
 
 function setLessonTopic(lessonId,topicName,el){
@@ -639,41 +663,46 @@ function setLessonTopic(lessonId,topicName,el){
 
 function setLessonStatus(id,status){
   const l=state.lessons.find(x=>x.id===id);if(!l)return;
-  const prev=l.status||'planned';
-  const st=getStudent(l.studentId);const sub=st?getActiveSub(st.id):null;
-  if(prev==='done'&&status!=='done'&&sub){
-    sub.lessonsLeft=Math.min(sub.lessonsTotal||999,sub.lessonsLeft+1);
-    const ppl=sub.lessonsTotal>0?Math.round(sub.amount/sub.lessonsTotal):0;
-    sub.amountLeft=Math.min(sub.amount,(sub.amountLeft||0)+ppl);
-  }
-  if(status==='done'&&prev!=='done'&&sub){
-    sub.lessonsLeft=Math.max(0,sub.lessonsLeft-1);
-    const ppl=sub.lessonsTotal>0?Math.round(sub.amount/sub.lessonsTotal):0;
-    sub.amountLeft=Math.max(0,(sub.amountLeft!==undefined?sub.amountLeft:sub.amount)-ppl);
-  }
   l.status=status;l.done=status==='done';
+  
+  const sub=getActiveSub(l.studentId);
+  if(l.status==='done' && sub && !l.isFree && !l.autoPaymentId) {
+    l.paid = true;
+  } else if (l.status!=='done' && !l.autoPaymentId) {
+    l.paid = false;
+  }
+
+  recalculateSubscriptions();
   save();renderCalendar();
 }
 
 function rerenderDetail(id){closeModal('modal-lesson-detail');renderCalendar();setTimeout(()=>openLessonDetail(id),50);}
 function toggleNotion(id){const l=state.lessons.find(x=>x.id===id);if(l){l.notionDone=!l.notionDone;save();renderCalendar();}}
+
 function togglePaidLesson(id){
   const l=state.lessons.find(x=>x.id===id);if(!l)return;
   const st=getStudent(l.studentId);if(!st)return;
+  
   if(l.paid){
-    // undo: remove auto payment
     if(l.autoPaymentId){state.payments=state.payments.filter(p=>p.id!==l.autoPaymentId);l.autoPaymentId=null;}
     l.paid=false;
   } else {
-    // Add explicit payment record for this lesson
-    const pid=uid();
-    const amount=typeof st.price==='number'?st.price:0;
-    state.payments.push({id:pid,studentId:st.id,type:'Разовий',amount,date:l.date,status:'Оплачено',autoFromLesson:l.id,isFree:amount===0});
-    l.paid=true;l.autoPaymentId=pid;
+    const sub=getActiveSub(st.id);
+    // Якщо є активний абонемент, просто ставимо прапорець (списуємо з нього)
+    if(sub && !l.isFree) {
+      l.paid = true;
+    } else {
+      // Якщо абонемента немає або урок безкоштовний, створюємо окрему касову операцію
+      const pid=uid();
+      const amount=l.isFree ? 0 : (typeof st.price==='number'?st.price:0);
+      state.payments.push({id:pid,studentId:st.id,type:'Разовий',amount,date:l.date,status:'Оплачено',autoFromLesson:l.id,isFree:l.isFree});
+      l.paid=true;l.autoPaymentId=pid;
+    }
   }
+  recalculateSubscriptions();
   save();renderCalendar();
 }
-function deleteLesson(id){state.lessons=state.lessons.filter(x=>x.id!==id);save();closeModal('modal-lesson-detail');renderCalendar();}
+function deleteLesson(id){state.lessons=state.lessons.filter(x=>x.id!==id);recalculateSubscriptions();save();closeModal('modal-lesson-detail');renderCalendar();}
 
 // ── ADD LESSON ────────────────────────────────────────────
 function saveLesson(){
@@ -683,9 +712,8 @@ function saveLesson(){
   const topic=document.getElementById('l-topic-val').value.trim();
   const dur=getPill('l-dur-pills')||'60';
   if(!sid||!date){alert('Вибери учня і вкажи дату');return;}
-  state.lessons.push({id:uid(),studentId:sid,date,time,topic,duration:parseInt(dur),status:'planned',done:false,notionDone:false,paid:false,isRegular:false});
+  state.lessons.push({id:uid(),studentId:sid,date,time,topic,duration:parseInt(dur),status:'planned',done:false,notionDone:false,paid:false,isRegular:false,isFree:false});
   save();closeModal('modal-add-lesson');
-  // jump calendar to added lesson's month
   const p=date.split('.');
   if(p.length>=3){calYear=parseInt(p[2]);calMonth=parseInt(p[1]);calSelectedDate=date;}
   renderCalendar();
@@ -760,7 +788,7 @@ function syncRegularLessons(){
       if(dayName&&student.days.includes(dayName)){
         const ds=pad(cur.getDate())+'.'+pad(cur.getMonth()+1)+'.'+cur.getFullYear();
         if(!state.lessons.find(l=>l.studentId===student.id&&l.date===ds&&l.isRegular)){
-          state.lessons.push({id:uid(),studentId:student.id,date:ds,time:student.time||'',topic:'',duration:student.duration||60,status:'planned',done:false,notionDone:false,paid:false,isRegular:true});
+          state.lessons.push({id:uid(),studentId:student.id,date:ds,time:student.time||'',topic:'',duration:student.duration||60,status:'planned',done:false,notionDone:false,paid:false,isRegular:true,isFree:false});
         }
       }
       cur.setDate(cur.getDate()+1);
@@ -783,7 +811,6 @@ function renderStudents(){
   if(!list.length){el.innerHTML=currentStudentTab==='active'?'<div class="empty">Учнів ще немає.<br>Додай першого!</div>':'<div class="empty">Архів порожній</div>';return;}
   el.innerHTML=list.map(s=>{
     const levels=s.levels||[s.level];
-    const debtTotal=state.payments.filter(p=>p.studentId===s.id&&p.status==='Очікує').reduce((a,p)=>a+(p.amount||0),0);
     const studentBalance=calcBalance(s.id);
     const sub=getActiveSub(s.id);
     const pct=levels.reduce((acc,lv)=>{const t=state.topics[lv]||[];if(!t.length)return acc;return{done:acc.done+t.filter(x=>(x.doneBy||[]).includes(s.id)).length,total:acc.total+t.length};},{done:0,total:0});
@@ -807,17 +834,16 @@ function renderStudents(){
 }
 
 // ── BALANCE HELPER ────────────────────────────────────────
-// For each done lesson:
-//   - if it has autoPaymentId → cost = amount of that payment (could be 0₴)
-//   - if no autoPaymentId → cost = student price (covered by subscription or manual payment)
-// Balance = totalPaid - totalCost
 function calcBalance(studentId){
   const s=getStudent(studentId);if(!s)return 0;
   const totalPaid=state.payments
     .filter(p=>p.studentId===studentId&&p.status==='Оплачено')
     .reduce((a,p)=>a+(p.amount||0),0);
+    
   const doneLessons=state.lessons.filter(l=>l.studentId===studentId&&l.status==='done');
+  
   const totalCost=doneLessons.reduce((sum,l)=>{
+    if(l.isFree) return sum; // Безкоштовний урок коштує 0 грн
     if(l.autoPaymentId){
       const pmt=state.payments.find(p=>p.id===l.autoPaymentId);
       return sum+(pmt?pmt.amount:0);
@@ -856,7 +882,7 @@ function openStudentDetail(id){
     ${nextTopicsHtml}
     ${s.notes?`<div class="card" style="margin-bottom:12px"><div style="font-size:13px;color:var(--text2);margin-bottom:6px">Нотатки</div>${s.notes}</div>`:''}
     <div class="section-title" style="margin-top:0">Проведені уроки (${doneLessons.length})</div>
-    <div class="card">${doneLessons.length?doneLessons.sort((a,b)=>dateToNum(b.date)-dateToNum(a.date)).slice(0,8).map(l=>`<div class="check-row"><div style="flex:1"><div style="font-size:14px;font-weight:500">${l.date} ${l.time}</div><div style="font-size:13px;color:var(--text2)">${l.topic||'Без теми'}</div></div><span class="badge badge-green">✅</span></div>`).join(''):'<div style="color:var(--text3);font-size:14px;padding:8px 0">Проведених уроків ще немає</div>'}</div>`;
+    <div class="card">${doneLessons.length?doneLessons.sort((a,b)=>dateToNum(b.date)-dateToNum(a.date)).slice(0,8).map(l=>`<div class="check-row"><div style="flex:1"><div style="font-size:14px;font-weight:500">${l.date} ${l.time}</div><div style="font-size:13px;color:var(--text2)">${l.topic||'Без теми'} ${l.isFree?'<span style="color:var(--accent)">(Безкоштовно)</span>':''}</div></div><span class="badge badge-green">✅</span></div>`).join(''):'<div style="color:var(--text3);font-size:14px;padding:8px 0">Проведених уроків ще немає</div>'}</div>`;
   openModal('modal-student-detail');
 }
 function toggleArchive(id){
@@ -887,11 +913,13 @@ function updateStudent(){
   s.price=parseInt(document.getElementById('es-price').value)||s.price;s.schedule=getPill('es-sched-pills')||'Регулярний';
   s.days=getMultiPill('es-days-pills');s.time=document.getElementById('es-time').value.trim();s.duration=parseInt(getPill('es-dur-pills'))||60;s.notes=document.getElementById('es-notes').value.trim();
   if(s.schedule==='Регулярний'){const todayN=dateToNum(today());state.lessons=state.lessons.filter(l=>!(l.studentId===id&&l.isRegular&&dateToNum(l.date)>=todayN));syncRegularLessons();}
+  recalculateSubscriptions();
   save();closeModal('modal-edit-student');renderStudents();
 }
 function deleteStudent(id){
   if(!confirm('Видалити учня і всі його дані?'))return;
   state.students=state.students.filter(s=>s.id!==id);state.lessons=state.lessons.filter(l=>l.studentId!==id);state.payments=state.payments.filter(p=>p.studentId!==id);
+  recalculateSubscriptions();
   save();closeModal('modal-student-detail');renderStudents();
 }
 function saveStudent(){
@@ -981,7 +1009,7 @@ function renderPayments(){
         <button class="ghost" style="color:var(--danger);font-size:18px;padding:0" onclick="deletePayment('${p.id}')">×</button>
       </div></div>`).join('')}</div>`).join('');
 }
-function markPaid(id){const p=state.payments.find(x=>x.id===id);if(p){p.status='Оплачено';save();renderPayments();}}
+function markPaid(id){const p=state.payments.find(x=>x.id===id);if(p){p.status='Оплачено';recalculateSubscriptions();save();renderPayments();}}
 function openEditPayment(id){
   const p=state.payments.find(x=>x.id===id);if(!p)return;
   document.getElementById('ep-id').value=id;
@@ -997,9 +1025,10 @@ function updatePayment(){
   p.amount=amountStr===''?p.amount:parseFloat(amountStr)||0;
   p.date=document.getElementById('ep-date').value.trim()||p.date;
   p.status=getPill('ep-status-pills')||p.status;
+  recalculateSubscriptions();
   save();closeModal('modal-edit-payment');renderPayments();
 }
-function deletePayment(id){state.payments=state.payments.filter(x=>x.id!==id);save();renderPayments();}
+function deletePayment(id){state.payments=state.payments.filter(x=>x.id!==id);recalculateSubscriptions();save();renderPayments();}
 function savePayment(){
   const studentId=document.getElementById('p-student').value;const type=getPill('p-type-pills')||'Разовий';
   const amountStr=document.getElementById('p-amount').value;
@@ -1008,7 +1037,9 @@ function savePayment(){
   if(!studentId){alert('Вибери учня');return;}
   const p={id:uid(),studentId,type,amount,date,status};
   if(type==='Абонемент'){p.lessonsTotal=lessonsCount;p.lessonsLeft=lessonsCount;p.amountLeft=amount;}
-  state.payments.push(p);save();closeModal('modal-add-payment');renderPayments();
+  state.payments.push(p);
+  recalculateSubscriptions();
+  save();closeModal('modal-add-payment');renderPayments();
   document.getElementById('p-amount').value='';document.getElementById('p-lessons-count').value='';
 }
 
@@ -1022,13 +1053,13 @@ function showDiagnostics(){
     const done=state.lessons.filter(l=>l.studentId===s.id&&l.status==='done');
     const pmts=state.payments.filter(p=>p.studentId===s.id&&p.status==='Оплачено');
     const totalPaid=pmts.reduce((a,p)=>a+(p.amount||0),0);
-    const balance=totalPaid-done.length*(s.price||0);
+    const balance=calcBalance(s.id);
     out+=`\n=== ${s.name} (ціна: ${s.price}₴) ===\n`;
     out+=`Проведено уроків: ${done.length}\n`;
     out+=`Разом сплачено: ${totalPaid}₴\n`;
     out+=`Баланс: ${balance}₴\n`;
     out+=`Уроки:\n`;
-    done.forEach(l=>out+=`  ${l.date} paid=${l.paid} autoId=${l.autoPaymentId?'так':'ні'}\n`);
+    done.forEach(l=>out+=`  ${l.date} paid=${l.paid} autoId=${l.autoPaymentId?'так':'ні'} free=${l.isFree?'так':'ні'}\n`);
     out+=`Оплати:\n`;
     pmts.forEach(p=>out+=`  ${p.date} ${p.amount}₴ ${p.type}\n`);
   });
