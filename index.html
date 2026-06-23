@@ -529,7 +529,7 @@ function lessonRow(l){
     </div>
     <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px">
       <span class="action-btn ${l.notionDone?'done':''}" onclick="toggleNotion('${l.id}')">${l.notionDone?'✓ Notion':'📎 Notion'}</span>
-      <span class="action-btn ${l.paid?'paid-done':''}" onclick="togglePaidLesson('${l.id}')">${l.paid?'✓ Оплач.':'💳 Оплач.'}</span>
+      <span class="action-btn ${(l.paid||l.subCovered)?'paid-done':''}" onclick="togglePaidLesson('${l.id}')">${l.paid?'✓ Оплач.':l.subCovered?'✓ Абон.':'💳 Оплач.'}</span>
     </div>
   </div>`;
 }
@@ -540,10 +540,22 @@ function cycleStatus(id){
   const st=getStudent(l.studentId);
   const sub=st?getActiveSub(st.id):null;
   if(cur==='planned'){
-    if(sub){sub.lessonsLeft=Math.max(0,sub.lessonsLeft-1);const ppl=sub.lessonsTotal>0?Math.round(sub.amount/sub.lessonsTotal):0;sub.amountLeft=Math.max(0,(sub.amountLeft!==undefined?sub.amountLeft:sub.amount)-ppl);}
+    // mark done: deduct sub if not already paid manually
+    if(sub&&!l.paid&&!l.autoPaymentId){
+      sub.lessonsLeft=Math.max(0,sub.lessonsLeft-1);
+      const ppl=sub.lessonsTotal>0?Math.round(sub.amount/sub.lessonsTotal):0;
+      sub.amountLeft=Math.max(0,(sub.amountLeft!==undefined?sub.amountLeft:sub.amount)-ppl);
+      l.subCovered=true;
+    }
     l.status='done';
   } else if(cur==='done'){
-    if(sub){sub.lessonsLeft=Math.min(sub.lessonsTotal||999,sub.lessonsLeft+1);const ppl=sub.lessonsTotal>0?Math.round(sub.amount/sub.lessonsTotal):0;sub.amountLeft=Math.min(sub.amount,(sub.amountLeft||0)+ppl);}
+    // undo done: restore sub if was sub-covered
+    if(l.subCovered&&sub){
+      sub.lessonsLeft=Math.min(sub.lessonsTotal||999,sub.lessonsLeft+1);
+      const ppl=sub.lessonsTotal>0?Math.round(sub.amount/sub.lessonsTotal):0;
+      sub.amountLeft=Math.min(sub.amount,(sub.amountLeft||0)+ppl);
+    }
+    l.subCovered=false;
     l.status='cancelled';
   } else {
     l.status='planned';
@@ -580,7 +592,7 @@ function openLessonDetail(id){
       <div class="row-between" style="margin-bottom:8px"><span style="color:var(--text2);font-size:13px">Notion</span>
         <span class="action-btn ${l.notionDone?'done':''}" onclick="toggleNotion('${id}');rerenderDetail('${id}')">${l.notionDone?'✓ Завантажено':'📎 Завантажити'}</span></div>
       <div class="row-between"><span style="color:var(--text2);font-size:13px">Оплата</span>
-        <span class="action-btn ${l.paid?'paid-done':''}" onclick="togglePaidLesson('${id}');rerenderDetail('${id}')">${l.paid?'✓ Оплачено':'💳 Оплатити'}</span></div>
+        <span class="action-btn ${(l.paid||l.subCovered)?'paid-done':''}" onclick="togglePaidLesson('${id}');rerenderDetail('${id}')">${l.paid?'✓ Оплачено':l.subCovered?'✓ Абонемент':'💳 Оплатити'}</span></div>
     </div>
     <div class="form-label" style="margin-bottom:6px" id="topic-label-${id}">Тема уроку ${l.topic?`<span class="badge badge-green">${l.topic}</span>`:''}</div>
     ${topicHtml}
@@ -603,8 +615,20 @@ function setLessonStatus(id,status){
   const l=state.lessons.find(x=>x.id===id);if(!l)return;
   const prev=l.status||'planned';
   const st=getStudent(l.studentId);const sub=st?getActiveSub(st.id):null;
-  if(prev==='done'&&status!=='done'&&sub){sub.lessonsLeft=Math.min(sub.lessonsTotal||999,sub.lessonsLeft+1);const ppl=sub.lessonsTotal>0?Math.round(sub.amount/sub.lessonsTotal):0;sub.amountLeft=Math.min(sub.amount,(sub.amountLeft||0)+ppl);}
-  if(status==='done'&&prev!=='done'&&sub){sub.lessonsLeft=Math.max(0,sub.lessonsLeft-1);const ppl=sub.lessonsTotal>0?Math.round(sub.amount/sub.lessonsTotal):0;sub.amountLeft=Math.max(0,(sub.amountLeft!==undefined?sub.amountLeft:sub.amount)-ppl);}
+  // undo previous done: restore sub if it was sub-covered
+  if(prev==='done'&&status!=='done'){
+    if(l.subCovered&&sub){sub.lessonsLeft=Math.min(sub.lessonsTotal||999,sub.lessonsLeft+1);const ppl=sub.lessonsTotal>0?Math.round(sub.amount/sub.lessonsTotal):0;sub.amountLeft=Math.min(sub.amount,(sub.amountLeft||0)+ppl);}
+    l.subCovered=false;
+  }
+  // apply new done: deduct sub and mark subCovered
+  if(status==='done'&&prev!=='done'){
+    if(sub&&!l.paid&&!l.autoPaymentId){
+      sub.lessonsLeft=Math.max(0,sub.lessonsLeft-1);
+      const ppl=sub.lessonsTotal>0?Math.round(sub.amount/sub.lessonsTotal):0;
+      sub.amountLeft=Math.max(0,(sub.amountLeft!==undefined?sub.amountLeft:sub.amount)-ppl);
+      l.subCovered=true;
+    }
+  }
   l.status=status;l.done=status==='done';
   save();renderCalendar();
 }
@@ -614,14 +638,21 @@ function toggleNotion(id){const l=state.lessons.find(x=>x.id===id);if(l){l.notio
 function togglePaidLesson(id){
   const l=state.lessons.find(x=>x.id===id);if(!l)return;
   const st=getStudent(l.studentId);if(!st)return;
-  if(l.paid){
+  const sub=getActiveSub(st.id);
+  if(l.paid||l.subCovered){
+    // undo: remove auto payment if exists, clear subCovered
     if(l.autoPaymentId){state.payments=state.payments.filter(p=>p.id!==l.autoPaymentId);l.autoPaymentId=null;}
-    l.paid=false;
+    l.paid=false;l.subCovered=false;
   } else {
-    const pid=uid();
-    const amount=typeof st.price==='number'?st.price:0;
-    state.payments.push({id:pid,studentId:st.id,type:'Разовий',amount,date:l.date,status:'Оплачено',autoFromLesson:l.id,isFree:amount===0});
-    l.paid=true;l.autoPaymentId=pid;
+    if(sub){
+      // covered by subscription — no separate payment record needed
+      l.subCovered=true;l.paid=false;
+    } else {
+      const pid=uid();
+      const amount=typeof st.price==='number'?st.price:0;
+      state.payments.push({id:pid,studentId:st.id,type:'Разовий',amount,date:l.date,status:'Оплачено',autoFromLesson:l.id,isFree:amount===0});
+      l.paid=true;l.autoPaymentId=pid;
+    }
   }
   save();renderCalendar();
 }
@@ -756,12 +787,27 @@ function renderStudents(){
     </div>`;
   }).join('');
 }
+
+// ── BALANCE HELPER ────────────────────────────────────────
+// A lesson is "covered" if it has a direct payment record (paid=true / autoPaymentId)
+// OR if it was paid via subscription (no autoPaymentId but sub was active when marked done)
+// Simpler rule: unpaidDone = done lessons where paid===false AND no autoPaymentId
+// Those cost price each. Everything else is either covered by explicit payment or sub.
+function calcBalance(studentId){
+  const s=getStudent(studentId);if(!s)return 0;
+  const doneLessons=state.lessons.filter(l=>l.studentId===studentId&&l.status==='done');
+  // lessons explicitly paid via button or manual payment entry
+  const explicitPaid=state.payments.filter(p=>p.studentId===studentId&&p.status==='Оплачено').reduce((a,p)=>a+(p.amount||0),0);
+  // lessons NOT covered by any payment record and NOT from subscription
+  const uncoveredCount=doneLessons.filter(l=>!l.paid&&!l.autoPaymentId&&!l.subCovered).length;
+  return explicitPaid - uncoveredCount*(s.price||0);
+}
+
 function openStudentDetail(id){
   const s=getStudent(id);if(!s)return;
   const levels=s.levels||[s.level];
   const doneLessons=state.lessons.filter(l=>l.studentId===id&&l.status==='done');
-  const paidTotal=state.payments.filter(p=>p.studentId===id&&p.status==='Оплачено').reduce((a,p)=>a+(p.amount||0),0);
-  const balance=paidTotal-doneLessons.length*(s.price||0);
+  const balance=calcBalance(id);
   const sub=getActiveSub(id);
   const nextTopicsHtml=levels.map(lv=>{const topics=state.topics[lv]||[];const next=topics.find(t=>!(t.doneBy||[]).includes(id));return next?`<div class="card" style="background:var(--accent-bg);border-color:var(--accent);margin-bottom:8px"><div style="font-size:12px;color:var(--accent-text);margin-bottom:4px;font-weight:500">Наступна тема (${lv})</div><div style="font-weight:500;color:var(--accent-text)">${next.name}</div></div>`:''}).join('');
   document.getElementById('student-detail-content').innerHTML=`
@@ -881,9 +927,9 @@ function renderPayments(){
   const balEl=document.getElementById('balance-by-student');
   const activeStudents=state.students.filter(s=>!s.archived);
   balEl.innerHTML=activeStudents.length?'<div class="card">'+activeStudents.map(s=>{
-    const paidTotal=state.payments.filter(p=>p.studentId===s.id&&p.status==='Оплачено').reduce((a,p)=>a+(p.amount||0),0);
     const done=state.lessons.filter(l=>l.studentId===s.id&&l.status==='done').length;
-    const balance=paidTotal-done*(s.price||0);const sub=getActiveSub(s.id);
+    const paidTotal=state.payments.filter(p=>p.studentId===s.id&&p.status==='Оплачено').reduce((a,p)=>a+(p.amount||0),0);
+    const balance=calcBalance(s.id);const sub=getActiveSub(s.id);
     return`<div class="check-row"><div class="avatar" style="width:32px;height:32px;font-size:11px">${initials(s.name)}</div>
       <div style="flex:1"><div style="font-size:14px;font-weight:500">${s.name}</div>
         <div style="font-size:12px;color:var(--text2)">${done} уроків · ${paidTotal.toLocaleString('uk')}₴</div>
