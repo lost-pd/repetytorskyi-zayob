@@ -31,17 +31,17 @@
   --info:#85B7EB;--info-bg:#042C53;
 }}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg2);color:var(--text);font-size:15px;line-height:1.5;min-height:100vh;padding-bottom:80px;}
-.header{background:var(--bg);border-bottom:0.5px solid var(--border);padding:16px 20px 12px;position:sticky;top:0;z-index:100;}
+.header{background:var(--bg);border-bottom:0.5px solid var(--border);padding:14px 20px 10px;position:sticky;top:0;z-index:100;}
 .header h1{font-size:18px;font-weight:500;letter-spacing:-0.3px;}
-.header p{font-size:13px;color:var(--text2);margin-top:2px;}
+.header p{font-size:13px;color:var(--text2);margin-top:1px;}
 .nav{position:fixed;bottom:0;left:0;right:0;background:var(--bg);border-top:0.5px solid var(--border);display:flex;z-index:100;padding-bottom:env(safe-area-inset-bottom);}
 .nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 4px;font-size:10px;color:var(--text3);background:none;border:none;cursor:pointer;}
 .nav-btn.active{color:var(--accent);}
 .nav-btn svg{width:22px;height:22px;}
-.page{display:none;padding:16px 16px 0;}
+.page{display:none;padding:12px 12px 0;}
 .page.active{display:block;}
 .card{background:var(--bg);border-radius:var(--r-lg);border:0.5px solid var(--border);padding:16px;margin-bottom:12px;}
-.section-title{font-size:12px;text-transform:uppercase;letter-spacing:0.6px;color:var(--text3);margin:20px 0 8px;font-weight:500;}
+.section-title{font-size:12px;text-transform:uppercase;letter-spacing:0.6px;color:var(--text3);margin:16px 0 8px;font-weight:500;}
 input[type=text],input[type=number],select,textarea{width:100%;padding:10px 12px;border-radius:var(--r-md);border:0.5px solid var(--border2);background:var(--bg2);color:var(--text);font-size:15px;font-family:inherit;outline:none;}
 input:focus,select:focus,textarea:focus{border-color:var(--accent);}
 textarea{resize:vertical;min-height:80px;}
@@ -69,14 +69,13 @@ button.danger-btn{background:var(--danger-bg);color:var(--danger);border:none;pa
 .avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:500;flex-shrink:0;background:var(--accent-bg);color:var(--accent-text);}
 .lesson-row{display:flex;align-items:flex-start;gap:10px;padding:12px 0;border-bottom:0.5px solid var(--border);}
 .lesson-row:last-child{border-bottom:none;}
-.lesson-time{font-size:13px;color:var(--text2);min-width:44px;flex-shrink:0;padding-top:2px;}
 .status-btn{font-size:20px;background:none;border:none;cursor:pointer;padding:2px;line-height:1;flex-shrink:0;}
 .action-btn{display:inline-flex;align-items:center;gap:4px;font-size:12px;padding:4px 10px;border-radius:var(--r-md);border:0.5px solid var(--border2);background:var(--bg2);color:var(--text2);cursor:pointer;white-space:nowrap;}
 .action-btn.done{background:var(--accent-bg);color:var(--accent-text);border-color:var(--accent);}
 .action-btn.paid-done{background:var(--info-bg);color:var(--info);border-color:var(--info);}
 .check-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--border);}
 .check-row:last-child{border-bottom:none;}
-.empty{text-align:center;padding:40px 20px;color:var(--text3);font-size:14px;}
+.empty{text-align:center;padding:32px 20px;color:var(--text3);font-size:14px;}
 .progress-bar{height:4px;border-radius:2px;background:var(--bg3);overflow:hidden;margin-top:6px;}
 .progress-fill{height:100%;background:var(--accent);border-radius:2px;}
 .tabs{display:flex;gap:2px;background:var(--bg3);border-radius:var(--r-md);padding:3px;margin-bottom:16px;}
@@ -91,13 +90,34 @@ button.danger-btn{background:var(--danger-bg);color:var(--danger);border:none;pa
 select option{background:var(--bg);}
 .bal-pos{color:var(--accent);}
 .bal-neg{color:var(--danger);}
-.top-action{display:flex;justify-content:flex-end;margin-bottom:12px;}
-.student-chip{display:inline-flex;align-items:center;gap:4px;font-size:11px;padding:3px 8px;border-radius:20px;border:0.5px solid var(--border2);background:var(--bg2);color:var(--text2);margin-right:4px;margin-bottom:4px;}
+.student-chip{display:inline-flex;align-items:center;gap:3px;font-size:11px;padding:3px 8px;border-radius:20px;border:0.5px solid var(--border2);background:var(--bg2);color:var(--text2);margin-right:4px;margin-bottom:4px;cursor:pointer;}
 .student-chip.checked{background:var(--accent-bg);color:var(--accent-text);border-color:var(--accent);}
 .topic-select-list{max-height:240px;overflow-y:auto;border:0.5px solid var(--border2);border-radius:var(--r-md);background:var(--bg2);}
 .topic-option{padding:10px 14px;cursor:pointer;font-size:14px;border-bottom:0.5px solid var(--border);}
 .topic-option:last-child{border-bottom:none;}
-.topic-option:hover,.topic-option.selected{background:var(--accent-bg);color:var(--accent-text);}
+.topic-option.selected{background:var(--accent-bg);color:var(--accent-text);}
+
+/* ── CALENDAR ── */
+.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding:0 2px;}
+.cal-month{font-size:16px;font-weight:500;}
+.cal-nav{background:none;border:none;font-size:20px;cursor:pointer;color:var(--text2);padding:4px 10px;border-radius:var(--r-md);}
+.cal-nav:active{background:var(--bg3);}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
+.cal-dow{text-align:center;font-size:11px;color:var(--text3);padding:4px 0;font-weight:500;}
+.cal-day{text-align:center;padding:4px 2px;border-radius:var(--r-md);cursor:pointer;position:relative;min-height:40px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:2px;}
+.cal-day:active{background:var(--bg3);}
+.cal-day .dn{font-size:14px;font-weight:400;line-height:1.4;}
+.cal-day.today .dn{background:var(--accent);color:#fff;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-weight:500;}
+.cal-day.selected{background:var(--accent-bg);}
+.cal-day.selected .dn{color:var(--accent-text);font-weight:500;}
+.cal-day.today.selected .dn{background:var(--accent);color:#fff;}
+.cal-day.other-month .dn{color:var(--text3);}
+.cal-dots{display:flex;gap:2px;justify-content:center;flex-wrap:wrap;max-width:32px;}
+.cal-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
+.cal-dot-done{background:var(--accent);}
+.cal-dot-planned{background:var(--info);}
+.cal-dot-cancelled{background:var(--danger);}
+.cal-selected-date{font-size:14px;font-weight:500;color:var(--text);margin:12px 0 8px;}
 </style>
 </head>
 <body>
@@ -109,19 +129,21 @@ select option{background:var(--bg);}
 
 <!-- PAGE: SCHEDULE -->
 <div id="page-schedule" class="page active">
-  <div class="top-action">
+  <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
     <button class="primary" style="width:auto;padding:9px 20px" onclick="openModal('modal-add-lesson')">+ Запланувати урок</button>
   </div>
-  <div class="stats-grid">
-    <div class="stat-card"><div class="stat-label">Уроків сьогодні</div><div class="stat-value" id="stat-today">0</div></div>
-    <div class="stat-card"><div class="stat-label">Цього тижня</div><div class="stat-value" id="stat-week">0</div></div>
+  <!-- Calendar -->
+  <div class="card" style="padding:12px">
+    <div class="cal-header">
+      <button class="cal-nav" onclick="calPrev()">‹</button>
+      <span class="cal-month" id="cal-month-label"></span>
+      <button class="cal-nav" onclick="calNext()">›</button>
+    </div>
+    <div class="cal-grid" id="cal-grid"></div>
   </div>
-  <div class="section-title">Сьогодні</div>
-  <div id="today-lessons"></div>
-  <div class="section-title">Найближчі уроки</div>
-  <div id="upcoming-lessons"></div>
-  <div class="section-title">Минулі уроки</div>
-  <div id="past-lessons"></div>
+  <!-- Selected day lessons -->
+  <div class="cal-selected-date" id="cal-selected-label"></div>
+  <div id="cal-day-lessons"></div>
   <div style="height:16px"></div>
 </div>
 
@@ -214,23 +236,20 @@ select option{background:var(--bg);}
 <div class="modal-overlay" id="modal-add-student"><div class="modal">
   <div class="modal-title">Новий учень</div>
   <div class="form-group"><label class="form-label">Ім'я</label><input type="text" id="s-name" placeholder="Ім'я учня"></div>
-  <div class="form-group">
-    <label class="form-label">Рівень (можна кілька)</label>
+  <div class="form-group"><label class="form-label">Рівень (можна кілька)</label>
     <div class="pill-row" id="s-level-pills">
       <div class="pill" onclick="togglePill(this)">A1</div><div class="pill" onclick="togglePill(this)">A2</div>
       <div class="pill" onclick="togglePill(this)">B1</div><div class="pill" onclick="togglePill(this)">B2</div>
     </div>
   </div>
   <div class="form-group"><label class="form-label">Вартість уроку (₴)</label><input type="number" id="s-price" placeholder="500"></div>
-  <div class="form-group">
-    <label class="form-label">Тип розкладу</label>
+  <div class="form-group"><label class="form-label">Тип розкладу</label>
     <div class="pill-row" id="s-sched-pills">
       <div class="pill selected" onclick="selectPill(this,'s-sched')">Регулярний</div>
       <div class="pill" onclick="selectPill(this,'s-sched')">Гнучкий</div>
     </div>
   </div>
-  <div id="s-reg-days" class="form-group">
-    <label class="form-label">Дні тижня</label>
+  <div id="s-reg-days" class="form-group"><label class="form-label">Дні тижня</label>
     <div class="pill-row" id="s-days-pills">
       <div class="pill" onclick="togglePill(this)">Пн</div><div class="pill" onclick="togglePill(this)">Вт</div>
       <div class="pill" onclick="togglePill(this)">Ср</div><div class="pill" onclick="togglePill(this)">Чт</div>
@@ -239,8 +258,7 @@ select option{background:var(--bg);}
     </div>
   </div>
   <div id="s-reg-time" class="form-group"><label class="form-label">Час</label><input type="text" id="s-time" placeholder="10:00"></div>
-  <div class="form-group">
-    <label class="form-label">Тривалість (хв)</label>
+  <div class="form-group"><label class="form-label">Тривалість (хв)</label>
     <div class="pill-row" id="s-dur-pills">
       <div class="pill" onclick="selectPill(this,'s-dur')">45</div>
       <div class="pill selected" onclick="selectPill(this,'s-dur')">60</div>
@@ -257,23 +275,20 @@ select option{background:var(--bg);}
   <div class="modal-title">Редагувати учня</div>
   <input type="hidden" id="es-id">
   <div class="form-group"><label class="form-label">Ім'я</label><input type="text" id="es-name"></div>
-  <div class="form-group">
-    <label class="form-label">Рівень (можна кілька)</label>
+  <div class="form-group"><label class="form-label">Рівень (можна кілька)</label>
     <div class="pill-row" id="es-level-pills">
       <div class="pill" onclick="togglePill(this)">A1</div><div class="pill" onclick="togglePill(this)">A2</div>
       <div class="pill" onclick="togglePill(this)">B1</div><div class="pill" onclick="togglePill(this)">B2</div>
     </div>
   </div>
   <div class="form-group"><label class="form-label">Вартість уроку (₴)</label><input type="number" id="es-price"></div>
-  <div class="form-group">
-    <label class="form-label">Тип розкладу</label>
+  <div class="form-group"><label class="form-label">Тип розкладу</label>
     <div class="pill-row" id="es-sched-pills">
       <div class="pill selected" onclick="selectPill(this,'es-sched')">Регулярний</div>
       <div class="pill" onclick="selectPill(this,'es-sched')">Гнучкий</div>
     </div>
   </div>
-  <div id="es-reg-days" class="form-group">
-    <label class="form-label">Дні тижня</label>
+  <div id="es-reg-days" class="form-group"><label class="form-label">Дні тижня</label>
     <div class="pill-row" id="es-days-pills">
       <div class="pill" onclick="togglePill(this)">Пн</div><div class="pill" onclick="togglePill(this)">Вт</div>
       <div class="pill" onclick="togglePill(this)">Ср</div><div class="pill" onclick="togglePill(this)">Чт</div>
@@ -282,8 +297,7 @@ select option{background:var(--bg);}
     </div>
   </div>
   <div id="es-reg-time" class="form-group"><label class="form-label">Час</label><input type="text" id="es-time"></div>
-  <div class="form-group">
-    <label class="form-label">Тривалість (хв)</label>
+  <div class="form-group"><label class="form-label">Тривалість (хв)</label>
     <div class="pill-row" id="es-dur-pills">
       <div class="pill" onclick="selectPill(this,'es-dur')">45</div>
       <div class="pill selected" onclick="selectPill(this,'es-dur')">60</div>
@@ -301,16 +315,14 @@ select option{background:var(--bg);}
   <div class="form-group"><label class="form-label">Учень</label><select id="l-student" onchange="updateLessonTopicList()"></select></div>
   <div class="form-group"><label class="form-label">Дата</label><input type="text" id="l-date" placeholder="дд.мм.рррр"></div>
   <div class="form-group"><label class="form-label">Час</label><input type="text" id="l-time" placeholder="10:00"></div>
-  <div class="form-group">
-    <label class="form-label">Тривалість (хв)</label>
+  <div class="form-group"><label class="form-label">Тривалість (хв)</label>
     <div class="pill-row" id="l-dur-pills">
       <div class="pill" onclick="selectPill(this,'l-dur')">45</div>
       <div class="pill selected" onclick="selectPill(this,'l-dur')">60</div>
       <div class="pill" onclick="selectPill(this,'l-dur')">90</div>
     </div>
   </div>
-  <div class="form-group">
-    <label class="form-label">Тема (необов'язково)</label>
+  <div class="form-group"><label class="form-label">Тема (необов'язково)</label>
     <div id="l-topic-list" class="topic-select-list"></div>
     <input type="hidden" id="l-topic-val">
   </div>
@@ -322,8 +334,7 @@ select option{background:var(--bg);}
 <div class="modal-overlay" id="modal-add-payment"><div class="modal">
   <div class="modal-title">Нова оплата</div>
   <div class="form-group"><label class="form-label">Учень</label><select id="p-student"></select></div>
-  <div class="form-group">
-    <label class="form-label">Тип</label>
+  <div class="form-group"><label class="form-label">Тип</label>
     <div class="pill-row" id="p-type-pills">
       <div class="pill selected" onclick="selectPill(this,'p-type')">Разовий</div>
       <div class="pill" onclick="selectPill(this,'p-type')">Абонемент</div>
@@ -335,8 +346,7 @@ select option{background:var(--bg);}
   </div>
   <div class="form-group"><label class="form-label">Сума (₴)</label><input type="number" id="p-amount" placeholder="500"></div>
   <div class="form-group"><label class="form-label">Дата</label><input type="text" id="p-date" placeholder="дд.мм.рррр"></div>
-  <div class="form-group">
-    <label class="form-label">Статус</label>
+  <div class="form-group"><label class="form-label">Статус</label>
     <div class="pill-row" id="p-status-pills">
       <div class="pill selected" onclick="selectPill(this,'p-status')">Оплачено</div>
       <div class="pill" onclick="selectPill(this,'p-status')">Очікує</div>
@@ -358,24 +368,16 @@ select option{background:var(--bg);}
   <button class="ghost" style="width:100%;text-align:center;margin-top:16px" onclick="closeModal('modal-student-detail')">Закрити</button>
 </div></div>
 
-<!-- MODAL: PICK TOPIC -->
-<div class="modal-overlay" id="modal-pick-topic"><div class="modal">
-  <div class="modal-title">Вибрати тему уроку</div>
-  <input type="hidden" id="pt-lesson-id">
-  <div id="pt-topic-list" class="topic-select-list" style="max-height:320px"></div>
-  <button class="ghost" style="width:100%;text-align:center;margin-top:16px" onclick="closeModal('modal-pick-topic')">Скасувати</button>
-</div></div>
-
 <script>
 // ── STATE ──────────────────────────────────────────────────
 let state={students:[],lessons:[],payments:[],topics:{A1:[],A2:[],B1:[],B2:[]}};
 let currentTopicLevel='A1',currentStudentTab='active',currentStatsPeriod='month',currentPaymentTab='stats';
+let calYear,calMonth,calSelectedDate;
 
 function save(){localStorage.setItem('czech_tutor_v1',JSON.stringify(state));}
 function load(){const d=localStorage.getItem('czech_tutor_v1');if(d)state=JSON.parse(d);}
 load();
 
-// Clean untouched past regular lessons on load
 (function cleanPast(){
   const todayN=dateToNum(today());
   state.lessons=state.lessons.filter(l=>{
@@ -397,84 +399,253 @@ function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2
 function dateInMonth(ds,y,m){if(!ds)return false;const p=ds.split('.');return p.length>=3&&parseInt(p[2])===y&&parseInt(p[1])===m;}
 function dateInYear(ds,y){if(!ds)return false;const p=ds.split('.');return p.length>=3&&parseInt(p[2])===y;}
 function getActiveSub(sid){return state.payments.find(p=>p.studentId===sid&&p.type==='Абонемент'&&p.status==='Оплачено'&&p.lessonsLeft>0);}
+function dateStrFromYMD(y,m,d){return pad(d)+'.'+pad(m)+'.'+y;}
 
-// lesson status helpers
 function statusEmoji(l){
   if(l.status==='done')return'✅';
   if(l.status==='cancelled')return'❌';
   return'📅';
 }
-function statusBadge(l){
-  if(l.status==='done')return'<span class="badge badge-green">✅ Проведено</span>';
-  if(l.status==='cancelled')return'<span class="badge badge-cancel">❌ Скасовано</span>';
-  return'<span class="badge badge-gray">📅 Заплановано</span>';
+
+// ── CALENDAR ──────────────────────────────────────────────
+const UA_MONTHS=['Січень','Лютий','Березень','Квітень','Травень','Червень','Липень','Серпень','Вересень','Жовтень','Листопад','Грудень'];
+const UA_MONTHS_GEN=['січня','лютого','березня','квітня','травня','червня','липня','серпня','вересня','жовтня','листопада','грудня'];
+const DOW=['Пн','Вт','Ср','Чт','Пт','Сб','Нд'];
+
+function initCalendar(){
+  const now=new Date();
+  calYear=now.getFullYear();
+  calMonth=now.getMonth()+1;
+  calSelectedDate=today();
 }
+
+function calPrev(){
+  calMonth--;if(calMonth<1){calMonth=12;calYear--;}
+  renderCalendar();
+}
+function calNext(){
+  calMonth++;if(calMonth>12){calMonth=1;calYear++;}
+  renderCalendar();
+}
+
+function renderCalendar(){
+  document.getElementById('cal-month-label').textContent=UA_MONTHS[calMonth-1]+' '+calYear;
+
+  // Build lesson map for this month: dateStr -> {done,planned,cancelled counts}
+  const lessonMap={};
+  state.lessons.forEach(l=>{
+    if(!dateInMonth(l.date,calYear,calMonth))return;
+    if(!lessonMap[l.date])lessonMap[l.date]={done:0,planned:0,cancelled:0};
+    const s=l.status||'planned';
+    lessonMap[l.date][s]=(lessonMap[l.date][s]||0)+1;
+  });
+
+  const firstDay=new Date(calYear,calMonth-1,1);
+  const daysInMonth=new Date(calYear,calMonth,0).getDate();
+  // Monday=0 offset
+  let startDow=firstDay.getDay()-1;
+  if(startDow<0)startDow=6;
+
+  const todayStr=today();
+  const grid=document.getElementById('cal-grid');
+
+  let html=DOW.map(d=>`<div class="cal-dow">${d}</div>`).join('');
+
+  // empty cells before first day
+  for(let i=0;i<startDow;i++) html+=`<div class="cal-day other-month"><span class="dn"></span></div>`;
+
+  for(let d=1;d<=daysInMonth;d++){
+    const ds=dateStrFromYMD(calYear,calMonth,d);
+    const isToday=ds===todayStr;
+    const isSel=ds===calSelectedDate;
+    const info=lessonMap[ds];
+    let dots='';
+    if(info){
+      if(info.done>0) dots+=`<div class="cal-dot cal-dot-done"></div>`.repeat(Math.min(info.done,3));
+      if(info.planned>0) dots+=`<div class="cal-dot cal-dot-planned"></div>`.repeat(Math.min(info.planned,2));
+      if(info.cancelled>0) dots+=`<div class="cal-dot cal-dot-cancelled"></div>`;
+    }
+    html+=`<div class="cal-day${isToday?' today':''}${isSel?' selected':''}" onclick="selectCalDay('${ds}')">
+      <span class="dn">${d}</span>
+      ${dots?`<div class="cal-dots">${dots}</div>`:''}
+    </div>`;
+  }
+
+  grid.innerHTML=html;
+  renderCalDayLessons();
+}
+
+function selectCalDay(ds){
+  calSelectedDate=ds;
+  renderCalendar();
+}
+
+function renderCalDayLessons(){
+  const ds=calSelectedDate;
+  const p=ds.split('.');
+  const label=p.length>=3?`${parseInt(p[0])} ${UA_MONTHS_GEN[parseInt(p[1])-1]} ${p[2]}`:'';
+  document.getElementById('cal-selected-label').textContent=label;
+
+  const lessons=state.lessons.filter(l=>l.date===ds).sort((a,b)=>(a.time||'').localeCompare(b.time||''));
+  const el=document.getElementById('cal-day-lessons');
+  if(!lessons.length){
+    el.innerHTML='<div class="empty" style="padding:20px">Уроків цього дня немає</div>';
+    return;
+  }
+  el.innerHTML='<div class="card">'+lessons.map(lessonRow).join('')+'</div>';
+}
+
+// ── LESSON ROW ────────────────────────────────────────────
+function lessonRow(l){
+  const st=getStudent(l.studentId);
+  const name=st?st.name:'?';
+  const sub=st?getActiveSub(st.id):null;
+  const subInfo=sub?`<span style="font-size:11px;color:var(--info)">Абон: ${sub.lessonsLeft}ур/${sub.amountLeft||0}₴</span>`:'';
+  return `<div class="lesson-row">
+    <button class="status-btn" title="Змінити статус" onclick="cycleStatus('${l.id}')">${statusEmoji(l)}</button>
+    <div style="flex:1;min-width:0;cursor:pointer" onclick="openLessonDetail('${l.id}')">
+      <div style="display:flex;align-items:baseline;gap:6px">
+        <span style="font-weight:500;font-size:15px">${name}</span>
+        <span style="font-size:12px;color:var(--text3)">${l.time||''}</span>
+      </div>
+      <div style="font-size:13px;color:var(--text2)">${l.topic||'Без теми'} · ${l.duration||60}хв</div>
+      ${subInfo}
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px">
+      <span class="action-btn ${l.notionDone?'done':''}" onclick="toggleNotion('${l.id}')">${l.notionDone?'✓ Notion':'📎 Notion'}</span>
+      <span class="action-btn ${l.paid?'paid-done':''}" onclick="togglePaidLesson('${l.id}')">${l.paid?'✓ Оплач.':'💳 Оплач.'}</span>
+    </div>
+  </div>`;
+}
+
 function cycleStatus(id){
   const l=state.lessons.find(x=>x.id===id);if(!l)return;
   const cur=l.status||'planned';
+  const st=getStudent(l.studentId);
+  const sub=st?getActiveSub(st.id):null;
   if(cur==='planned'){
-    // mark done: deduct from subscription
-    const st=getStudent(l.studentId);
-    const sub=st?getActiveSub(st.id):null;
-    if(sub){
-      sub.lessonsLeft=Math.max(0,sub.lessonsLeft-1);
-      const ppl=sub.lessonsTotal>0?Math.round(sub.amount/sub.lessonsTotal):0;
-      sub.amountLeft=Math.max(0,(sub.amountLeft!==undefined?sub.amountLeft:sub.amount)-ppl);
-    }
+    if(sub){sub.lessonsLeft=Math.max(0,sub.lessonsLeft-1);const ppl=sub.lessonsTotal>0?Math.round(sub.amount/sub.lessonsTotal):0;sub.amountLeft=Math.max(0,(sub.amountLeft!==undefined?sub.amountLeft:sub.amount)-ppl);}
     l.status='done';
   } else if(cur==='done'){
-    // undo done: restore subscription
-    const st=getStudent(l.studentId);
-    const sub=st?getActiveSub(st.id):null;
-    if(sub){
-      sub.lessonsLeft=Math.min(sub.lessonsTotal||999,sub.lessonsLeft+1);
-      const ppl=sub.lessonsTotal>0?Math.round(sub.amount/sub.lessonsTotal):0;
-      sub.amountLeft=Math.min(sub.amount,(sub.amountLeft||0)+ppl);
-    }
+    if(sub){sub.lessonsLeft=Math.min(sub.lessonsTotal||999,sub.lessonsLeft+1);const ppl=sub.lessonsTotal>0?Math.round(sub.amount/sub.lessonsTotal):0;sub.amountLeft=Math.min(sub.amount,(sub.amountLeft||0)+ppl);}
     l.status='cancelled';
   } else {
     l.status='planned';
   }
-  // keep legacy .done in sync
   l.done=l.status==='done';
-  save();renderSchedule();
+  save();renderCalendar();
 }
 
-const DAY_MAP={'Пн':1,'Вт':2,'Ср':3,'Чт':4,'Пт':5,'Сб':6,'Нд':0};
+function openLessonDetail(id){
+  const l=state.lessons.find(x=>x.id===id);if(!l)return;
+  const st=getStudent(l.studentId);
+  const name=st?st.name:'?';
+  const sub=st?getActiveSub(st.id):null;
+  const levels=st?st.levels||[st.level]:[];
+  const allTopics=[];
+  levels.forEach(lv=>{(state.topics[lv]||[]).forEach(t=>allTopics.push({name:t.name,level:lv}));});
+  const topicHtml=allTopics.length
+    ?`<div class="topic-select-list" style="max-height:180px">${allTopics.map(t=>`<div class="topic-option ${l.topic===t.name?'selected':''}" onclick="setLessonTopic('${id}','${t.name.replace(/'/g,"\\'").replace(/"/g,'&quot;')}',this)">[${t.level}] ${t.name}</div>`).join('')}</div>`
+    :`<span style="color:var(--text3);font-size:13px">Тем ще немає</span>`;
 
-function syncRegularLessons(){
-  const now=new Date();
-  state.students.filter(s=>!s.archived&&s.schedule==='Регулярний'&&s.days&&s.days.length).forEach(student=>{
-    const end=new Date();end.setDate(end.getDate()+84);
-    const cur=new Date(now);
-    while(cur<=end){
-      const dow=cur.getDay();
-      const dayName=Object.keys(DAY_MAP).find(k=>DAY_MAP[k]===dow);
-      if(dayName&&student.days.includes(dayName)){
-        const dateStr=pad(cur.getDate())+'.'+pad(cur.getMonth()+1)+'.'+cur.getFullYear();
-        const exists=state.lessons.find(l=>l.studentId===student.id&&l.date===dateStr&&l.isRegular);
-        if(!exists){
-          state.lessons.push({id:uid(),studentId:student.id,date:dateStr,time:student.time||'',
-            topic:'',duration:student.duration||60,status:'planned',done:false,notionDone:false,paid:false,isRegular:true});
-        }
-      }
-      cur.setDate(cur.getDate()+1);
-    }
-  });
+  document.getElementById('lesson-detail-content').innerHTML=`
+    <div class="modal-title">Урок: ${name}</div>
+    <div class="card" style="margin-bottom:12px">
+      <div class="row-between" style="margin-bottom:10px"><span style="color:var(--text2);font-size:13px">Статус</span>
+        <div style="display:flex;gap:10px">
+          <button class="status-btn" style="font-size:22px;opacity:${(l.status||'planned')==='done'?1:0.35}" onclick="setLessonStatus('${id}','done');rerenderDetail('${id}')">✅</button>
+          <button class="status-btn" style="font-size:22px;opacity:${(l.status||'planned')==='planned'?1:0.35}" onclick="setLessonStatus('${id}','planned');rerenderDetail('${id}')">📅</button>
+          <button class="status-btn" style="font-size:22px;opacity:${(l.status||'planned')==='cancelled'?1:0.35}" onclick="setLessonStatus('${id}','cancelled');rerenderDetail('${id}')">❌</button>
+        </div>
+      </div>
+      <div class="row-between" style="margin-bottom:8px"><span style="color:var(--text2);font-size:13px">Дата і час</span><span style="font-weight:500">${l.date} ${l.time}</span></div>
+      <div class="row-between" style="margin-bottom:8px"><span style="color:var(--text2);font-size:13px">Тривалість</span><span>${l.duration||60} хв</span></div>
+      ${sub?`<div class="row-between" style="margin-bottom:8px"><span style="color:var(--text2);font-size:13px">Абонемент</span><span style="color:var(--info)">${sub.lessonsLeft} ур. / ${sub.amountLeft||0}₴</span></div>`:''}
+      <div class="row-between" style="margin-bottom:8px"><span style="color:var(--text2);font-size:13px">Notion</span>
+        <span class="action-btn ${l.notionDone?'done':''}" onclick="toggleNotion('${id}');rerenderDetail('${id}')">${l.notionDone?'✓ Завантажено':'📎 Завантажити'}</span></div>
+      <div class="row-between"><span style="color:var(--text2);font-size:13px">Оплата</span>
+        <span class="action-btn ${l.paid?'paid-done':''}" onclick="togglePaidLesson('${id}');rerenderDetail('${id}')">${l.paid?'✓ Оплачено':'💳 Оплатити'}</span></div>
+    </div>
+    <div class="form-label" style="margin-bottom:6px" id="topic-label-${id}">Тема уроку ${l.topic?`<span class="badge badge-green">${l.topic}</span>`:''}</div>
+    ${topicHtml}
+    <div style="margin-top:12px">
+      <button class="danger-btn" style="width:100%" onclick="deleteLesson('${id}')">Видалити урок</button>
+    </div>`;
+  openModal('modal-lesson-detail');
+}
+
+function setLessonTopic(lessonId,topicName,el){
+  const l=state.lessons.find(x=>x.id===lessonId);if(!l)return;
+  if(l.topic===topicName){l.topic='';el.classList.remove('selected');}
+  else{l.topic=topicName;el.closest('.topic-select-list').querySelectorAll('.topic-option').forEach(o=>o.classList.remove('selected'));el.classList.add('selected');}
   save();
+  const lbl=document.getElementById('topic-label-'+lessonId);
+  if(lbl)lbl.innerHTML=`Тема уроку ${l.topic?`<span class="badge badge-green">${l.topic}</span>`:''}`;
+}
+
+function setLessonStatus(id,status){
+  const l=state.lessons.find(x=>x.id===id);if(!l)return;
+  const prev=l.status||'planned';
+  const st=getStudent(l.studentId);const sub=st?getActiveSub(st.id):null;
+  if(prev==='done'&&status!=='done'&&sub){sub.lessonsLeft=Math.min(sub.lessonsTotal||999,sub.lessonsLeft+1);const ppl=sub.lessonsTotal>0?Math.round(sub.amount/sub.lessonsTotal):0;sub.amountLeft=Math.min(sub.amount,(sub.amountLeft||0)+ppl);}
+  if(status==='done'&&prev!=='done'&&sub){sub.lessonsLeft=Math.max(0,sub.lessonsLeft-1);const ppl=sub.lessonsTotal>0?Math.round(sub.amount/sub.lessonsTotal):0;sub.amountLeft=Math.max(0,(sub.amountLeft!==undefined?sub.amountLeft:sub.amount)-ppl);}
+  l.status=status;l.done=status==='done';
+  save();renderCalendar();
+}
+
+function rerenderDetail(id){closeModal('modal-lesson-detail');renderCalendar();setTimeout(()=>openLessonDetail(id),50);}
+function toggleNotion(id){const l=state.lessons.find(x=>x.id===id);if(l){l.notionDone=!l.notionDone;save();renderCalendar();}}
+function togglePaidLesson(id){
+  const l=state.lessons.find(x=>x.id===id);if(!l)return;
+  const st=getStudent(l.studentId);if(!st)return;
+  if(l.paid){if(l.autoPaymentId){state.payments=state.payments.filter(p=>p.id!==l.autoPaymentId);l.autoPaymentId=null;}l.paid=false;}
+  else{const pid=uid();state.payments.push({id:pid,studentId:st.id,type:'Разовий',amount:st.price||0,date:l.date,status:'Оплачено',autoFromLesson:l.id});l.paid=true;l.autoPaymentId=pid;}
+  save();renderCalendar();
+}
+function deleteLesson(id){state.lessons=state.lessons.filter(x=>x.id!==id);save();closeModal('modal-lesson-detail');renderCalendar();}
+
+// ── ADD LESSON ────────────────────────────────────────────
+function saveLesson(){
+  const sid=document.getElementById('l-student').value;
+  const date=document.getElementById('l-date').value.trim();
+  const time=document.getElementById('l-time').value.trim();
+  const topic=document.getElementById('l-topic-val').value.trim();
+  const dur=getPill('l-dur-pills')||'60';
+  if(!sid||!date){alert('Вибери учня і вкажи дату');return;}
+  state.lessons.push({id:uid(),studentId:sid,date,time,topic,duration:parseInt(dur),status:'planned',done:false,notionDone:false,paid:false,isRegular:false});
+  save();closeModal('modal-add-lesson');
+  // jump calendar to added lesson's month
+  const p=date.split('.');
+  if(p.length>=3){calYear=parseInt(p[2]);calMonth=parseInt(p[1]);calSelectedDate=date;}
+  renderCalendar();
+  document.getElementById('l-time').value='';document.getElementById('l-topic-val').value='';
+}
+
+function updateLessonTopicList(){
+  const sid=document.getElementById('l-student').value;
+  const container=document.getElementById('l-topic-list');
+  document.getElementById('l-topic-val').value='';
+  if(!sid){container.innerHTML='<div style="padding:10px 14px;color:var(--text3);font-size:13px">Спочатку вибери учня</div>';return;}
+  const st=getStudent(sid);if(!st){return;}
+  const levels=st.levels||[st.level];
+  const allTopics=[];
+  levels.forEach(lv=>{(state.topics[lv]||[]).forEach(t=>allTopics.push({name:t.name,level:lv}));});
+  if(!allTopics.length){container.innerHTML='<div style="padding:10px 14px;color:var(--text3);font-size:13px">Тем ще немає</div>';return;}
+  container.innerHTML=allTopics.map(t=>`<div class="topic-option" data-name="${t.name}" onclick="selectLessonTopic(this,'l-topic-val','l-topic-list')">[${t.level}] ${t.name}</div>`).join('');
+}
+function selectLessonTopic(el,valId,listId){
+  document.getElementById(listId).querySelectorAll('.topic-option').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');document.getElementById(valId).value=el.dataset.name;
 }
 
 // ── MODALS ─────────────────────────────────────────────────
 function openModal(id){
-  if(id==='modal-add-lesson'){fillStudentSelect('modal-add-lesson');document.getElementById('l-date').value=today();updateLessonTopicList();}
+  if(id==='modal-add-lesson'){fillStudentSelect('modal-add-lesson');document.getElementById('l-date').value=calSelectedDate||today();updateLessonTopicList();}
   if(id==='modal-add-payment'){fillStudentSelect('modal-add-payment');document.getElementById('p-date').value=today();document.getElementById('p-sub-group').style.display='none';}
   document.getElementById(id).classList.add('open');
 }
 function closeModal(id){document.getElementById(id).classList.remove('open');}
-document.querySelectorAll('.modal-overlay').forEach(el=>{
-  el.addEventListener('click',e=>{if(e.target===el)el.classList.remove('open');});
-});
-
+document.querySelectorAll('.modal-overlay').forEach(el=>{el.addEventListener('click',e=>{if(e.target===el)el.classList.remove('open');});});
 function fillStudentSelect(modalId){
   const sid=modalId==='modal-add-lesson'?'l-student':'p-student';
   const sel=document.getElementById(sid);
@@ -482,38 +653,11 @@ function fillStudentSelect(modalId){
   sel.innerHTML=active.length?active.map(s=>`<option value="${s.id}">${s.name} (${(s.levels||[s.level]).join('+')})</option>`).join(''):'<option value="">— немає учнів —</option>';
 }
 
-// Build topic list for lesson modal
-function updateLessonTopicList(){
-  const sid=document.getElementById('l-student').value;
-  const container=document.getElementById('l-topic-list');
-  document.getElementById('l-topic-val').value='';
-  container.querySelectorAll('.topic-option').forEach(o=>o.classList.remove('selected'));
-  if(!sid){container.innerHTML='<div style="padding:10px 14px;color:var(--text3);font-size:13px">Спочатку вибери учня</div>';return;}
-  const st=getStudent(sid);
-  if(!st){return;}
-  const levels=st.levels||[st.level];
-  const allTopics=[];
-  levels.forEach(lv=>{(state.topics[lv]||[]).forEach(t=>allTopics.push({name:t.name,level:lv}));});
-  if(!allTopics.length){container.innerHTML='<div style="padding:10px 14px;color:var(--text3);font-size:13px">Тем ще немає</div>';return;}
-  container.innerHTML=allTopics.map((t,i)=>`<div class="topic-option" data-idx="${i}" data-name="${t.name}" onclick="selectLessonTopic(this,'l-topic-val','l-topic-list')">[${t.level}] ${t.name}</div>`).join('');
-}
-
-function selectLessonTopic(el,valId,listId){
-  document.getElementById(listId).querySelectorAll('.topic-option').forEach(o=>o.classList.remove('selected'));
-  el.classList.add('selected');
-  document.getElementById(valId).value=el.dataset.name;
-}
-
 // ── PILLS ─────────────────────────────────────────────────
 function selectPill(el,group){
   el.closest('.pill-row').querySelectorAll('.pill').forEach(p=>p.classList.remove('selected'));
   el.classList.add('selected');
-  if(group==='s-sched'||group==='es-sched'){
-    const p=group==='s-sched'?'s':'es';
-    const reg=el.textContent==='Регулярний';
-    document.getElementById(p+'-reg-days').style.display=reg?'':'none';
-    document.getElementById(p+'-reg-time').style.display=reg?'':'none';
-  }
+  if(group==='s-sched'||group==='es-sched'){const p=group==='s-sched'?'s':'es';const reg=el.textContent==='Регулярний';document.getElementById(p+'-reg-days').style.display=reg?'':'none';document.getElementById(p+'-reg-time').style.display=reg?'':'none';}
   if(group==='p-type')document.getElementById('p-sub-group').style.display=el.textContent==='Абонемент'?'':'none';
 }
 function togglePill(el){el.classList.toggle('selected');}
@@ -526,156 +670,32 @@ function showPage(name,btn){
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('page-'+name).classList.add('active');
   btn.classList.add('active');
-  if(name==='schedule'){syncRegularLessons();renderSchedule();}
+  if(name==='schedule'){syncRegularLessons();renderCalendar();}
   if(name==='students')renderStudents();
   if(name==='topics')renderTopics();
   if(name==='payments')renderPayments();
 }
 
-// ── SCHEDULE ──────────────────────────────────────────────
-function renderSchedule(){
-  const tod=today(),todayN=dateToNum(tod);
-  const todayL=state.lessons.filter(l=>l.date===tod).sort((a,b)=>(a.time||'').localeCompare(b.time||''));
-  const upcoming=state.lessons.filter(l=>dateToNum(l.date)>todayN).sort((a,b)=>dateToNum(a.date)-dateToNum(b.date)).slice(0,10);
-  const past=state.lessons.filter(l=>dateToNum(l.date)<todayN&&(l.status==='done'||l.status==='cancelled'||l.notionDone||l.paid||l.topic||!l.isRegular))
-    .sort((a,b)=>dateToNum(b.date)-dateToNum(a.date)).slice(0,15);
-
-  document.getElementById('stat-today').textContent=todayL.length;
-  const weekN=todayN+7;
-  document.getElementById('stat-week').textContent=state.lessons.filter(l=>{const n=dateToNum(l.date);return n>=todayN&&n<=weekN;}).length;
-
-  const r=(el,items,empty)=>{document.getElementById(el).innerHTML=items.length?'<div class="card">'+items.map(lessonRow).join('')+'</div>':`<div class="empty">${empty}</div>`;};
-  r('today-lessons',todayL,'Уроків сьогодні немає');
-  r('upcoming-lessons',upcoming,'Немає запланованих уроків');
-  r('past-lessons',past,'Минулих уроків ще немає');
-}
-
-function lessonRow(l){
-  const st=getStudent(l.studentId);
-  const name=st?st.name:'?';
-  const sub=st?getActiveSub(st.id):null;
-  const subInfo=sub?`<span style="font-size:11px;color:var(--info)">Абон: ${sub.lessonsLeft}ур/${sub.amountLeft||0}₴</span>`:'';
-  const status=l.status||'planned';
-  return `<div class="lesson-row">
-    <button class="status-btn" title="Змінити статус" onclick="cycleStatus('${l.id}')">${statusEmoji(l)}</button>
-    <div style="flex:1;min-width:0;cursor:pointer" onclick="openLessonDetail('${l.id}')">
-      <div style="display:flex;align-items:baseline;gap:6px">
-        <span style="font-weight:500;font-size:15px">${name}</span>
-        <span style="font-size:12px;color:var(--text3)">${l.time||''} ${l.date||''}</span>
-      </div>
-      <div style="font-size:13px;color:var(--text2)">${l.topic||'Без теми'} · ${l.duration||60}хв</div>
-      ${subInfo}
-    </div>
-    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px">
-      <span class="action-btn ${l.notionDone?'done':''}" onclick="toggleNotion('${l.id}')">${l.notionDone?'✓ Notion':'📎 Notion'}</span>
-      <span class="action-btn ${l.paid?'paid-done':''}" onclick="togglePaidLesson('${l.id}')">${l.paid?'✓ Оплач.':'💳 Оплач.'}</span>
-    </div>
-  </div>`;
-}
-
-function openLessonDetail(id){
-  const l=state.lessons.find(x=>x.id===id);if(!l)return;
-  const st=getStudent(l.studentId);
-  const name=st?st.name:'?';
-  const sub=st?getActiveSub(st.id):null;
-  const levels=st?st.levels||[st.level]:[];
-  const allTopics=[];
-  levels.forEach(lv=>{(state.topics[lv]||[]).forEach(t=>allTopics.push({name:t.name,level:lv}));});
-
-  const topicHtml=allTopics.length
-    ?`<div class="topic-select-list" style="max-height:180px">${allTopics.map(t=>`<div class="topic-option ${l.topic===t.name?'selected':''}" onclick="setLessonTopic('${id}','${t.name.replace(/'/g,"\\'")}',this)">[${t.level}] ${t.name}</div>`).join('')}</div>`
-    :`<span style="color:var(--text3);font-size:13px">Тем ще немає</span>`;
-
-  document.getElementById('lesson-detail-content').innerHTML=`
-    <div class="modal-title">Урок: ${name}</div>
-    <div class="card" style="margin-bottom:12px">
-      <div class="row-between" style="margin-bottom:8px"><span style="color:var(--text2);font-size:13px">Статус</span>
-        <div style="display:flex;gap:8px">
-          <button class="status-btn" style="font-size:22px" onclick="setLessonStatus('${id}','done');rerenderDetail('${id}')" title="Проведено">✅</button>
-          <button class="status-btn" style="font-size:22px" onclick="setLessonStatus('${id}','planned');rerenderDetail('${id}')" title="Заплановано">📅</button>
-          <button class="status-btn" style="font-size:22px" onclick="setLessonStatus('${id}','cancelled');rerenderDetail('${id}')" title="Скасовано">❌</button>
-        </div>
-      </div>
-      <div class="row-between" style="margin-bottom:8px"><span style="color:var(--text2);font-size:13px">Дата і час</span><span style="font-weight:500">${l.date} ${l.time}</span></div>
-      <div class="row-between" style="margin-bottom:8px"><span style="color:var(--text2);font-size:13px">Тривалість</span><span>${l.duration||60} хв</span></div>
-      ${sub?`<div class="row-between" style="margin-bottom:8px"><span style="color:var(--text2);font-size:13px">Абонемент</span><span style="color:var(--info)">${sub.lessonsLeft} ур. / ${sub.amountLeft||0}₴</span></div>`:''}
-      <div class="row-between" style="margin-bottom:8px"><span style="color:var(--text2);font-size:13px">Notion</span>
-        <span class="action-btn ${l.notionDone?'done':''}" onclick="toggleNotion('${id}');rerenderDetail('${id}')">${l.notionDone?'✓ Завантажено':'📎 Завантажити'}</span></div>
-      <div class="row-between"><span style="color:var(--text2);font-size:13px">Оплата</span>
-        <span class="action-btn ${l.paid?'paid-done':''}" onclick="togglePaidLesson('${id}');rerenderDetail('${id}')">${l.paid?'✓ Оплачено':'💳 Оплатити'}</span></div>
-    </div>
-    <div class="form-label" style="margin-bottom:6px">Тема уроку ${l.topic?'<span class="badge badge-green">'+l.topic+'</span>':''}</div>
-    ${topicHtml}
-    <div style="display:flex;gap:8px;margin-top:12px">
-      <button class="danger-btn" style="flex:1" onclick="deleteLesson('${id}')">Видалити урок</button>
-    </div>`;
-  openModal('modal-lesson-detail');
-}
-
-function setLessonTopic(lessonId, topicName, el){
-  const l=state.lessons.find(x=>x.id===lessonId);if(!l)return;
-  if(l.topic===topicName){l.topic='';el.classList.remove('selected');}
-  else{
-    l.topic=topicName;
-    el.closest('.topic-select-list').querySelectorAll('.topic-option').forEach(o=>o.classList.remove('selected'));
-    el.classList.add('selected');
-  }
+// ── REGULAR LESSONS ───────────────────────────────────────
+const DAY_MAP={'Пн':1,'Вт':2,'Ср':3,'Чт':4,'Пт':5,'Сб':6,'Нд':0};
+function syncRegularLessons(){
+  const now=new Date();
+  state.students.filter(s=>!s.archived&&s.schedule==='Регулярний'&&s.days&&s.days.length).forEach(student=>{
+    const end=new Date();end.setDate(end.getDate()+84);
+    const cur=new Date(now);
+    while(cur<=end){
+      const dow=cur.getDay();
+      const dayName=Object.keys(DAY_MAP).find(k=>DAY_MAP[k]===dow);
+      if(dayName&&student.days.includes(dayName)){
+        const ds=pad(cur.getDate())+'.'+pad(cur.getMonth()+1)+'.'+cur.getFullYear();
+        if(!state.lessons.find(l=>l.studentId===student.id&&l.date===ds&&l.isRegular)){
+          state.lessons.push({id:uid(),studentId:student.id,date:ds,time:student.time||'',topic:'',duration:student.duration||60,status:'planned',done:false,notionDone:false,paid:false,isRegular:true});
+        }
+      }
+      cur.setDate(cur.getDate()+1);
+    }
+  });
   save();
-  // update badge in header without closing modal
-  const badge=document.querySelector('#lesson-detail-content .form-label .badge');
-  const label=document.querySelector('#lesson-detail-content .form-label');
-  if(label){
-    label.innerHTML=`Тема уроку ${l.topic?'<span class="badge badge-green">'+l.topic+'</span>':''}`;
-  }
-}
-
-function setLessonStatus(id,status){
-  const l=state.lessons.find(x=>x.id===id);if(!l)return;
-  const prev=l.status||'planned';
-  const st=getStudent(l.studentId);
-  const sub=st?getActiveSub(st.id):null;
-  // undo previous done
-  if(prev==='done'&&status!=='done'&&sub){
-    sub.lessonsLeft=Math.min(sub.lessonsTotal||999,sub.lessonsLeft+1);
-    const ppl=sub.lessonsTotal>0?Math.round(sub.amount/sub.lessonsTotal):0;
-    sub.amountLeft=Math.min(sub.amount,(sub.amountLeft||0)+ppl);
-  }
-  // apply new done
-  if(status==='done'&&prev!=='done'&&sub){
-    sub.lessonsLeft=Math.max(0,sub.lessonsLeft-1);
-    const ppl=sub.lessonsTotal>0?Math.round(sub.amount/sub.lessonsTotal):0;
-    sub.amountLeft=Math.max(0,(sub.amountLeft!==undefined?sub.amountLeft:sub.amount)-ppl);
-  }
-  l.status=status;l.done=status==='done';
-  save();renderSchedule();
-}
-
-function rerenderDetail(id){closeModal('modal-lesson-detail');renderSchedule();setTimeout(()=>openLessonDetail(id),50);}
-function toggleNotion(id){const l=state.lessons.find(x=>x.id===id);if(l){l.notionDone=!l.notionDone;save();renderSchedule();}}
-function togglePaidLesson(id){
-  const l=state.lessons.find(x=>x.id===id);if(!l)return;
-  const st=getStudent(l.studentId);if(!st)return;
-  if(l.paid){
-    if(l.autoPaymentId){state.payments=state.payments.filter(p=>p.id!==l.autoPaymentId);l.autoPaymentId=null;}
-    l.paid=false;
-  } else {
-    const pid=uid();
-    state.payments.push({id:pid,studentId:st.id,type:'Разовий',amount:st.price||0,date:l.date,status:'Оплачено',autoFromLesson:l.id});
-    l.paid=true;l.autoPaymentId=pid;
-  }
-  save();renderSchedule();
-}
-function deleteLesson(id){state.lessons=state.lessons.filter(x=>x.id!==id);save();closeModal('modal-lesson-detail');renderSchedule();}
-function saveLesson(){
-  const sid=document.getElementById('l-student').value;
-  const date=document.getElementById('l-date').value.trim();
-  const time=document.getElementById('l-time').value.trim();
-  const topic=document.getElementById('l-topic-val').value.trim();
-  const dur=getPill('l-dur-pills')||'60';
-  if(!sid||!date){alert('Вибери учня і вкажи дату');return;}
-  state.lessons.push({id:uid(),studentId:sid,date,time,topic,duration:parseInt(dur),status:'planned',done:false,notionDone:false,paid:false,isRegular:false});
-  save();closeModal('modal-add-lesson');renderSchedule();
-  document.getElementById('l-time').value='';document.getElementById('l-topic-val').value='';
 }
 
 // ── STUDENTS ─────────────────────────────────────────────
@@ -686,7 +706,6 @@ function switchStudentTab(tab,el){
   document.getElementById('add-student-btn-wrap').style.display=tab==='active'?'':'none';
   renderStudents();
 }
-
 function renderStudents(){
   const list=state.students.filter(s=>currentStudentTab==='active'?!s.archived:s.archived);
   const el=document.getElementById('students-list');
@@ -714,7 +733,6 @@ function renderStudents(){
     </div>`;
   }).join('');
 }
-
 function openStudentDetail(id){
   const s=getStudent(id);if(!s)return;
   const levels=s.levels||[s.level];
@@ -722,11 +740,7 @@ function openStudentDetail(id){
   const paidTotal=state.payments.filter(p=>p.studentId===id&&p.status==='Оплачено').reduce((a,p)=>a+(p.amount||0),0);
   const balance=paidTotal-doneLessons.length*(s.price||0);
   const sub=getActiveSub(id);
-  const nextTopicsHtml=levels.map(lv=>{
-    const topics=state.topics[lv]||[];
-    const next=topics.find(t=>!(t.doneBy||[]).includes(id));
-    return next?`<div class="card" style="background:var(--accent-bg);border-color:var(--accent);margin-bottom:8px"><div style="font-size:12px;color:var(--accent-text);margin-bottom:4px;font-weight:500">Наступна тема (${lv})</div><div style="font-weight:500;color:var(--accent-text)">${next.name}</div></div>`:'';
-  }).join('');
+  const nextTopicsHtml=levels.map(lv=>{const topics=state.topics[lv]||[];const next=topics.find(t=>!(t.doneBy||[]).includes(id));return next?`<div class="card" style="background:var(--accent-bg);border-color:var(--accent);margin-bottom:8px"><div style="font-size:12px;color:var(--accent-text);margin-bottom:4px;font-weight:500">Наступна тема (${lv})</div><div style="font-weight:500;color:var(--accent-text)">${next.name}</div></div>`:''}).join('');
   document.getElementById('student-detail-content').innerHTML=`
     <div class="row-between" style="margin-bottom:16px">
       <div style="display:flex;align-items:center;gap:12px">
@@ -752,76 +766,47 @@ function openStudentDetail(id){
     <div class="card">${doneLessons.length?doneLessons.sort((a,b)=>dateToNum(b.date)-dateToNum(a.date)).slice(0,8).map(l=>`<div class="check-row"><div style="flex:1"><div style="font-size:14px;font-weight:500">${l.date} ${l.time}</div><div style="font-size:13px;color:var(--text2)">${l.topic||'Без теми'}</div></div><span class="badge badge-green">✅</span></div>`).join(''):'<div style="color:var(--text3);font-size:14px;padding:8px 0">Проведених уроків ще немає</div>'}</div>`;
   openModal('modal-student-detail');
 }
-
 function toggleArchive(id){
   const s=getStudent(id);if(!s)return;
   s.archived=!s.archived;
-  if(s.archived){
-    const todayN=dateToNum(today());
-    state.lessons=state.lessons.filter(l=>!(l.studentId===id&&l.isRegular&&dateToNum(l.date)>=todayN));
-  } else {syncRegularLessons();}
+  if(s.archived){const todayN=dateToNum(today());state.lessons=state.lessons.filter(l=>!(l.studentId===id&&l.isRegular&&dateToNum(l.date)>=todayN));}
+  else syncRegularLessons();
   save();closeModal('modal-student-detail');renderStudents();
 }
-
 function openEditStudent(id){
   const s=getStudent(id);if(!s)return;
   const levels=s.levels||(s.level?[s.level]:[]);
-  document.getElementById('es-id').value=id;
-  document.getElementById('es-name').value=s.name;
-  document.getElementById('es-price').value=s.price||'';
-  document.getElementById('es-time').value=s.time||'';
-  document.getElementById('es-notes').value=s.notes||'';
+  document.getElementById('es-id').value=id;document.getElementById('es-name').value=s.name;
+  document.getElementById('es-price').value=s.price||'';document.getElementById('es-time').value=s.time||'';document.getElementById('es-notes').value=s.notes||'';
   document.querySelectorAll('#es-level-pills .pill').forEach(p=>p.classList.toggle('selected',levels.includes(p.textContent.trim())));
   const sched=s.schedule||'Регулярний';
   document.querySelectorAll('#es-sched-pills .pill').forEach(p=>p.classList.toggle('selected',p.textContent.trim()===sched));
-  document.getElementById('es-reg-days').style.display=sched==='Регулярний'?'':'none';
-  document.getElementById('es-reg-time').style.display=sched==='Регулярний'?'':'none';
+  document.getElementById('es-reg-days').style.display=sched==='Регулярний'?'':'none';document.getElementById('es-reg-time').style.display=sched==='Регулярний'?'':'none';
   const days=s.days||[];
   document.querySelectorAll('#es-days-pills .pill').forEach(p=>p.classList.toggle('selected',days.includes(p.textContent.trim())));
   document.querySelectorAll('#es-dur-pills .pill').forEach(p=>p.classList.toggle('selected',p.textContent.trim()===String(s.duration||60)));
   openModal('modal-edit-student');
 }
-
 function updateStudent(){
-  const id=document.getElementById('es-id').value;
-  const s=getStudent(id);if(!s)return;
-  const levels=getMultiPill('es-level-pills');
-  if(!levels.length){alert('Вибери рівень');return;}
-  s.name=document.getElementById('es-name').value.trim()||s.name;
-  s.levels=levels;s.level=levels[0];
-  s.price=parseInt(document.getElementById('es-price').value)||s.price;
-  s.schedule=getPill('es-sched-pills')||'Регулярний';
-  s.days=getMultiPill('es-days-pills');
-  s.time=document.getElementById('es-time').value.trim();
-  s.duration=parseInt(getPill('es-dur-pills'))||60;
-  s.notes=document.getElementById('es-notes').value.trim();
-  if(s.schedule==='Регулярний'){
-    const todayN=dateToNum(today());
-    state.lessons=state.lessons.filter(l=>!(l.studentId===id&&l.isRegular&&dateToNum(l.date)>=todayN));
-    syncRegularLessons();
-  }
+  const id=document.getElementById('es-id').value;const s=getStudent(id);if(!s)return;
+  const levels=getMultiPill('es-level-pills');if(!levels.length){alert('Вибери рівень');return;}
+  s.name=document.getElementById('es-name').value.trim()||s.name;s.levels=levels;s.level=levels[0];
+  s.price=parseInt(document.getElementById('es-price').value)||s.price;s.schedule=getPill('es-sched-pills')||'Регулярний';
+  s.days=getMultiPill('es-days-pills');s.time=document.getElementById('es-time').value.trim();s.duration=parseInt(getPill('es-dur-pills'))||60;s.notes=document.getElementById('es-notes').value.trim();
+  if(s.schedule==='Регулярний'){const todayN=dateToNum(today());state.lessons=state.lessons.filter(l=>!(l.studentId===id&&l.isRegular&&dateToNum(l.date)>=todayN));syncRegularLessons();}
   save();closeModal('modal-edit-student');renderStudents();
 }
-
 function deleteStudent(id){
   if(!confirm('Видалити учня і всі його дані?'))return;
-  state.students=state.students.filter(s=>s.id!==id);
-  state.lessons=state.lessons.filter(l=>l.studentId!==id);
-  state.payments=state.payments.filter(p=>p.studentId!==id);
+  state.students=state.students.filter(s=>s.id!==id);state.lessons=state.lessons.filter(l=>l.studentId!==id);state.payments=state.payments.filter(p=>p.studentId!==id);
   save();closeModal('modal-student-detail');renderStudents();
 }
-
 function saveStudent(){
-  const name=document.getElementById('s-name').value.trim();
-  const levels=getMultiPill('s-level-pills');
-  const price=parseInt(document.getElementById('s-price').value)||0;
-  const schedule=getPill('s-sched-pills')||'Регулярний';
-  const days=getMultiPill('s-days-pills');
-  const time=document.getElementById('s-time').value.trim();
-  const duration=parseInt(getPill('s-dur-pills'))||60;
-  const notes=document.getElementById('s-notes').value.trim();
-  if(!name){alert('Введи ім\'я');return;}
-  if(!levels.length){alert('Вибери рівень');return;}
+  const name=document.getElementById('s-name').value.trim();const levels=getMultiPill('s-level-pills');
+  const price=parseInt(document.getElementById('s-price').value)||0;const schedule=getPill('s-sched-pills')||'Регулярний';
+  const days=getMultiPill('s-days-pills');const time=document.getElementById('s-time').value.trim();
+  const duration=parseInt(getPill('s-dur-pills'))||60;const notes=document.getElementById('s-notes').value.trim();
+  if(!name){alert('Введи ім\'я');return;}if(!levels.length){alert('Вибери рівень');return;}
   state.students.push({id:uid(),name,levels,level:levels[0],price,schedule,days,time,duration,notes,archived:false});
   save();syncRegularLessons();closeModal('modal-add-student');renderStudents();
   document.getElementById('s-name').value='';document.getElementById('s-price').value='';
@@ -830,11 +815,7 @@ function saveStudent(){
 }
 
 // ── TOPICS ────────────────────────────────────────────────
-function switchTopicLevel(level){
-  currentTopicLevel=level;
-  document.querySelectorAll('#page-topics .tab').forEach((t,i)=>t.classList.toggle('active',['A1','A2','B1','B2'][i]===level));
-  renderTopics();
-}
+function switchTopicLevel(level){currentTopicLevel=level;document.querySelectorAll('#page-topics .tab').forEach((t,i)=>t.classList.toggle('active',['A1','A2','B1','B2'][i]===level));renderTopics();}
 function renderTopics(){
   const topics=state.topics[currentTopicLevel]||[];
   const studentsAtLevel=state.students.filter(s=>!s.archived&&(s.levels||[s.level]).includes(currentTopicLevel));
@@ -845,42 +826,19 @@ function renderTopics(){
     <div style="flex:1;min-width:0"><div style="font-size:15px">${t.name}</div>
       ${studentsAtLevel.length?`<div style="font-size:12px;color:var(--text3);margin-top:2px">${(t.doneBy||[]).length}/${studentsAtLevel.length} учнів</div>`:''}
     </div>
-    <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;justify-content:flex-end;max-width:140px">
-      ${studentsAtLevel.map(s=>{
-        const done=(t.doneBy||[]).includes(s.id);
-        return`<div title="${s.name}" onclick="toggleTopicDone('${currentTopicLevel}',${idx},'${s.id}')"
-          class="student-chip ${done?'checked':''}">${done?'✓':''} ${firstName(s.name)}</div>`;
-      }).join('')}
+    <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;justify-content:flex-end;max-width:150px">
+      ${studentsAtLevel.map(s=>{const done=(t.doneBy||[]).includes(s.id);return`<div class="student-chip ${done?'checked':''}" onclick="toggleTopicDone('${currentTopicLevel}',${idx},'${s.id}')">${done?'✓ ':''} ${firstName(s.name)}</div>`;}).join('')}
       <button class="ghost" style="color:var(--danger);font-size:18px;padding:0 2px" onclick="deleteTopic('${currentTopicLevel}',${idx})">×</button>
     </div>
   </div>`).join('')+'</div>';
 }
-function toggleTopicDone(level,idx,studentId){
-  const t=state.topics[level][idx];if(!t.doneBy)t.doneBy=[];
-  const pos=t.doneBy.indexOf(studentId);if(pos===-1)t.doneBy.push(studentId);else t.doneBy.splice(pos,1);
-  save();renderTopics();
-}
-function addTopic(){
-  const input=document.getElementById('new-topic-input');const name=input.value.trim();if(!name)return;
-  if(!state.topics[currentTopicLevel])state.topics[currentTopicLevel]=[];
-  state.topics[currentTopicLevel].push({name,doneBy:[]});input.value='';save();renderTopics();
-}
+function toggleTopicDone(level,idx,studentId){const t=state.topics[level][idx];if(!t.doneBy)t.doneBy=[];const pos=t.doneBy.indexOf(studentId);if(pos===-1)t.doneBy.push(studentId);else t.doneBy.splice(pos,1);save();renderTopics();}
+function addTopic(){const input=document.getElementById('new-topic-input');const name=input.value.trim();if(!name)return;if(!state.topics[currentTopicLevel])state.topics[currentTopicLevel]=[];state.topics[currentTopicLevel].push({name,doneBy:[]});input.value='';save();renderTopics();}
 function deleteTopic(level,idx){state.topics[level].splice(idx,1);save();renderTopics();}
 
 // ── PAYMENTS ─────────────────────────────────────────────
-function switchPaymentTab(tab,el){
-  currentPaymentTab=tab;
-  document.querySelectorAll('#page-payments>.tabs .tab').forEach(t=>t.classList.remove('active'));
-  el.classList.add('active');
-  document.getElementById('payment-stats-section').style.display=tab==='stats'?'':'none';
-  document.getElementById('payment-list-section').style.display=tab==='list'?'':'none';
-  renderPayments();
-}
-function switchStatsPeriod(period,el){
-  currentStatsPeriod=period;
-  document.querySelectorAll('#stats-period-tabs .tab').forEach(t=>t.classList.remove('active'));
-  el.classList.add('active');renderPayments();
-}
+function switchPaymentTab(tab,el){currentPaymentTab=tab;document.querySelectorAll('#page-payments>.tabs .tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');document.getElementById('payment-stats-section').style.display=tab==='stats'?'':'none';document.getElementById('payment-list-section').style.display=tab==='list'?'':'none';renderPayments();}
+function switchStatsPeriod(period,el){currentStatsPeriod=period;document.querySelectorAll('#stats-period-tabs .tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');renderPayments();}
 function renderPayments(){
   const now=new Date();const y=now.getFullYear();const m=now.getMonth()+1;
   let earned=0,pending=0,lessonsDone=0;
@@ -897,68 +855,54 @@ function renderPayments(){
   document.getElementById('stat-pending').textContent=pending.toLocaleString('uk')+' ₴';
   document.getElementById('stat-lessons-done').textContent=lessonsDone;
   document.getElementById('stat-avg').textContent=(lessonsDone>0?Math.round(earned/lessonsDone):0).toLocaleString('uk')+' ₴';
-
   const balEl=document.getElementById('balance-by-student');
   const activeStudents=state.students.filter(s=>!s.archived);
   balEl.innerHTML=activeStudents.length?'<div class="card">'+activeStudents.map(s=>{
     const paidTotal=state.payments.filter(p=>p.studentId===s.id&&p.status==='Оплачено').reduce((a,p)=>a+(p.amount||0),0);
     const done=state.lessons.filter(l=>l.studentId===s.id&&l.status==='done').length;
-    const balance=paidTotal-done*(s.price||0);
-    const sub=getActiveSub(s.id);
-    return`<div class="check-row">
-      <div class="avatar" style="width:32px;height:32px;font-size:11px">${initials(s.name)}</div>
+    const balance=paidTotal-done*(s.price||0);const sub=getActiveSub(s.id);
+    return`<div class="check-row"><div class="avatar" style="width:32px;height:32px;font-size:11px">${initials(s.name)}</div>
       <div style="flex:1"><div style="font-size:14px;font-weight:500">${s.name}</div>
-        <div style="font-size:12px;color:var(--text2)">${done} уроків · ${paidTotal.toLocaleString('uk')}₴ сплачено</div>
+        <div style="font-size:12px;color:var(--text2)">${done} уроків · ${paidTotal.toLocaleString('uk')}₴</div>
         ${sub?`<div style="font-size:12px;color:var(--info)">Абон: ${sub.lessonsLeft}ур / ${sub.amountLeft||0}₴</div>`:''}
       </div>
       <div style="font-weight:500;${balance>=0?'color:var(--accent)':'color:var(--danger)'}">${balance>=0?'+':''}${balance.toLocaleString('uk')}₴</div>
     </div>`;
   }).join('')+'</div>':'<div class="empty">Учнів немає</div>';
-
   const listEl=document.getElementById('payments-list');
   if(!state.payments.length){listEl.innerHTML='<div class="empty">Оплат ще немає</div>';return;}
-  const grouped={};
-  state.students.forEach(s=>{grouped[s.id]={name:s.name,payments:[]};});
-  state.payments.forEach(p=>{
-    if(grouped[p.studentId])grouped[p.studentId].payments.push(p);
-    else{grouped['_']=grouped['_']||{name:'Невідомо',payments:[]};grouped['_'].payments.push(p);}
-  });
+  const grouped={};state.students.forEach(s=>{grouped[s.id]={name:s.name,payments:[]};});
+  state.payments.forEach(p=>{if(grouped[p.studentId])grouped[p.studentId].payments.push(p);else{grouped['_']=grouped['_']||{name:'Невідомо',payments:[]};grouped['_'].payments.push(p);}});
   listEl.innerHTML=Object.values(grouped).filter(g=>g.payments.length>0).map(g=>`
     <div class="section-title">${g.name}</div>
     <div class="card">${g.payments.sort((a,b)=>dateToNum(b.date)-dateToNum(a.date)).map(p=>`
-      <div class="check-row">
-        <div style="flex:1"><div style="font-weight:500">${(p.amount||0).toLocaleString('uk')} ₴</div>
-          <div style="font-size:13px;color:var(--text2)">${p.type||'Разовий'} · ${p.date||''}${p.type==='Абонемент'&&p.lessonsLeft!==undefined?` · ${p.lessonsLeft}ур / ${p.amountLeft||0}₴`:''}</div>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px">
-          <span class="badge ${p.status==='Оплачено'?'badge-green':'badge-warn'}">${p.status}</span>
-          ${p.status==='Очікує'?`<button class="ghost" style="color:var(--accent);font-size:13px" onclick="markPaid('${p.id}')">✓</button>`:''}
-          <button class="ghost" style="color:var(--danger);font-size:18px;padding:0" onclick="deletePayment('${p.id}')">×</button>
-        </div>
-      </div>`).join('')}
-    </div>`).join('');
+      <div class="check-row"><div style="flex:1"><div style="font-weight:500">${(p.amount||0).toLocaleString('uk')} ₴</div>
+        <div style="font-size:13px;color:var(--text2)">${p.type||'Разовий'} · ${p.date||''}${p.type==='Абонемент'&&p.lessonsLeft!==undefined?` · ${p.lessonsLeft}ур / ${p.amountLeft||0}₴`:''}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="badge ${p.status==='Оплачено'?'badge-green':'badge-warn'}">${p.status}</span>
+        ${p.status==='Очікує'?`<button class="ghost" style="color:var(--accent);font-size:13px" onclick="markPaid('${p.id}')">✓</button>`:''}
+        <button class="ghost" style="color:var(--danger);font-size:18px;padding:0" onclick="deletePayment('${p.id}')">×</button>
+      </div></div>`).join('')}</div>`).join('');
 }
 function markPaid(id){const p=state.payments.find(x=>x.id===id);if(p){p.status='Оплачено';save();renderPayments();}}
 function deletePayment(id){state.payments=state.payments.filter(x=>x.id!==id);save();renderPayments();}
 function savePayment(){
-  const studentId=document.getElementById('p-student').value;
-  const type=getPill('p-type-pills')||'Разовий';
-  const amount=parseInt(document.getElementById('p-amount').value)||0;
-  const date=document.getElementById('p-date').value.trim();
-  const status=getPill('p-status-pills')||'Оплачено';
-  const lessonsCount=type==='Абонемент'?parseInt(document.getElementById('p-lessons-count').value)||0:undefined;
+  const studentId=document.getElementById('p-student').value;const type=getPill('p-type-pills')||'Разовий';
+  const amount=parseInt(document.getElementById('p-amount').value)||0;const date=document.getElementById('p-date').value.trim();
+  const status=getPill('p-status-pills')||'Оплачено';const lessonsCount=type==='Абонемент'?parseInt(document.getElementById('p-lessons-count').value)||0:undefined;
   if(!studentId){alert('Вибери учня');return;}
   const p={id:uid(),studentId,type,amount,date,status};
   if(type==='Абонемент'){p.lessonsTotal=lessonsCount;p.lessonsLeft=lessonsCount;p.amountLeft=amount;}
-  state.payments.push(p);
-  save();closeModal('modal-add-payment');renderPayments();
+  state.payments.push(p);save();closeModal('modal-add-payment');renderPayments();
   document.getElementById('p-amount').value='';document.getElementById('p-lessons-count').value='';
 }
 
 // ── INIT ─────────────────────────────────────────────────
 document.getElementById('header-date').textContent=new Date().toLocaleDateString('uk-UA',{weekday:'long',day:'numeric',month:'long'});
+initCalendar();
 syncRegularLessons();
-renderSchedule();
+renderCalendar();
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
 </body>
