@@ -356,6 +356,22 @@ select option{background:var(--bg);}
   <button class="ghost" style="width:100%;text-align:center;margin-top:12px" onclick="closeModal('modal-add-payment')">Скасувати</button>
 </div></div>
 
+<!-- MODAL: EDIT PAYMENT -->
+<div class="modal-overlay" id="modal-edit-payment"><div class="modal">
+  <div class="modal-title">Редагувати оплату</div>
+  <input type="hidden" id="ep-id">
+  <div class="form-group"><label class="form-label">Сума (₴)</label><input type="number" id="ep-amount" placeholder="500"></div>
+  <div class="form-group"><label class="form-label">Дата</label><input type="text" id="ep-date" placeholder="дд.мм.рррр"></div>
+  <div class="form-group"><label class="form-label">Статус</label>
+    <div class="pill-row" id="ep-status-pills">
+      <div class="pill selected" onclick="selectPill(this,'ep-status')">Оплачено</div>
+      <div class="pill" onclick="selectPill(this,'ep-status')">Очікує</div>
+    </div>
+  </div>
+  <button class="primary" onclick="updatePayment()">Зберегти зміни</button>
+  <button class="ghost" style="width:100%;text-align:center;margin-top:12px" onclick="closeModal('modal-edit-payment')">Скасувати</button>
+</div></div>
+
 <!-- MODAL: LESSON DETAIL -->
 <div class="modal-overlay" id="modal-lesson-detail"><div class="modal">
   <div id="lesson-detail-content"></div>
@@ -598,8 +614,15 @@ function toggleNotion(id){const l=state.lessons.find(x=>x.id===id);if(l){l.notio
 function togglePaidLesson(id){
   const l=state.lessons.find(x=>x.id===id);if(!l)return;
   const st=getStudent(l.studentId);if(!st)return;
-  if(l.paid){if(l.autoPaymentId){state.payments=state.payments.filter(p=>p.id!==l.autoPaymentId);l.autoPaymentId=null;}l.paid=false;}
-  else{const pid=uid();state.payments.push({id:pid,studentId:st.id,type:'Разовий',amount:st.price||0,date:l.date,status:'Оплачено',autoFromLesson:l.id});l.paid=true;l.autoPaymentId=pid;}
+  if(l.paid){
+    if(l.autoPaymentId){state.payments=state.payments.filter(p=>p.id!==l.autoPaymentId);l.autoPaymentId=null;}
+    l.paid=false;
+  } else {
+    const pid=uid();
+    const amount=typeof st.price==='number'?st.price:0;
+    state.payments.push({id:pid,studentId:st.id,type:'Разовий',amount,date:l.date,status:'Оплачено',autoFromLesson:l.id,isFree:amount===0});
+    l.paid=true;l.autoPaymentId=pid;
+  }
   save();renderCalendar();
 }
 function deleteLesson(id){state.lessons=state.lessons.filter(x=>x.id!==id);save();closeModal('modal-lesson-detail');renderCalendar();}
@@ -876,20 +899,39 @@ function renderPayments(){
   listEl.innerHTML=Object.values(grouped).filter(g=>g.payments.length>0).map(g=>`
     <div class="section-title">${g.name}</div>
     <div class="card">${g.payments.sort((a,b)=>dateToNum(b.date)-dateToNum(a.date)).map(p=>`
-      <div class="check-row"><div style="flex:1"><div style="font-weight:500">${(p.amount||0).toLocaleString('uk')} ₴</div>
+      <div class="check-row"><div style="flex:1"><div style="font-weight:500">${p.amount===0?'<span style="color:var(--text2)">Безкоштовно</span>':(p.amount||0).toLocaleString('uk')+' ₴'}</div>
         <div style="font-size:13px;color:var(--text2)">${p.type||'Разовий'} · ${p.date||''}${p.type==='Абонемент'&&p.lessonsLeft!==undefined?` · ${p.lessonsLeft}ур / ${p.amountLeft||0}₴`:''}</div>
       </div>
       <div style="display:flex;align-items:center;gap:8px">
         <span class="badge ${p.status==='Оплачено'?'badge-green':'badge-warn'}">${p.status}</span>
         ${p.status==='Очікує'?`<button class="ghost" style="color:var(--accent);font-size:13px" onclick="markPaid('${p.id}')">✓</button>`:''}
+        <button class="ghost" style="color:var(--text2);font-size:15px;padding:0 2px" onclick="openEditPayment('${p.id}')">✏️</button>
         <button class="ghost" style="color:var(--danger);font-size:18px;padding:0" onclick="deletePayment('${p.id}')">×</button>
       </div></div>`).join('')}</div>`).join('');
 }
 function markPaid(id){const p=state.payments.find(x=>x.id===id);if(p){p.status='Оплачено';save();renderPayments();}}
+function openEditPayment(id){
+  const p=state.payments.find(x=>x.id===id);if(!p)return;
+  document.getElementById('ep-id').value=id;
+  document.getElementById('ep-amount').value=p.amount;
+  document.getElementById('ep-date').value=p.date||'';
+  document.querySelectorAll('#ep-status-pills .pill').forEach(el=>el.classList.toggle('selected',el.textContent.trim()===p.status));
+  openModal('modal-edit-payment');
+}
+function updatePayment(){
+  const id=document.getElementById('ep-id').value;
+  const p=state.payments.find(x=>x.id===id);if(!p)return;
+  const amountStr=document.getElementById('ep-amount').value;
+  p.amount=amountStr===''?p.amount:parseFloat(amountStr)||0;
+  p.date=document.getElementById('ep-date').value.trim()||p.date;
+  p.status=getPill('ep-status-pills')||p.status;
+  save();closeModal('modal-edit-payment');renderPayments();
+}
 function deletePayment(id){state.payments=state.payments.filter(x=>x.id!==id);save();renderPayments();}
 function savePayment(){
   const studentId=document.getElementById('p-student').value;const type=getPill('p-type-pills')||'Разовий';
-  const amount=parseInt(document.getElementById('p-amount').value)||0;const date=document.getElementById('p-date').value.trim();
+  const amountStr=document.getElementById('p-amount').value;
+  const amount=amountStr===''?0:parseFloat(amountStr)||0;const date=document.getElementById('p-date').value.trim();
   const status=getPill('p-status-pills')||'Оплачено';const lessonsCount=type==='Абонемент'?parseInt(document.getElementById('p-lessons-count').value)||0:undefined;
   if(!studentId){alert('Вибери учня');return;}
   const p={id:uid(),studentId,type,amount,date,status};
