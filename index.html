@@ -404,6 +404,25 @@ load();
   save();
 })();
 
+// Migration: recalculate subscription lessonsLeft/amountLeft from scratch
+// to fix any incorrect deductions from free/explicitly-paid lessons
+(function fixSubCounters(){
+  state.payments.filter(p=>p.type==='Абонемент'&&p.status==='Оплачено'&&p.lessonsTotal).forEach(sub=>{
+    // count done lessons for this student that use this sub (not explicitly paid)
+    const usedLessons=state.lessons.filter(l=>
+      l.studentId===sub.studentId &&
+      l.status==='done' &&
+      !l.autoPaymentId &&
+      !l.paid &&
+      dateToNum(l.date)>=dateToNum(sub.date||'01.01.2000')
+    ).length;
+    sub.lessonsLeft=Math.max(0,sub.lessonsTotal-usedLessons);
+    const ppl=sub.lessonsTotal>0?Math.round(sub.amount/sub.lessonsTotal):0;
+    sub.amountLeft=Math.max(0,sub.amount-usedLessons*ppl);
+  });
+  save();
+})();
+
 // ── UTILS ──────────────────────────────────────────────────
 function today(){const d=new Date();return pad(d.getDate())+'.'+pad(d.getMonth()+1)+'.'+d.getFullYear();}
 function pad(n){return n<10?'0'+n:''+n;}
@@ -548,16 +567,16 @@ function cycleStatus(id){
   const st=getStudent(l.studentId);
   const sub=st?getActiveSub(st.id):null;
   if(cur==='planned'){
-    // deduct from subscription counter (cosmetic — tracks remaining lessons)
-    if(sub){
+    // deduct from subscription counter only if lesson has no explicit payment
+    if(sub&&!l.autoPaymentId&&!l.paid){
       sub.lessonsLeft=Math.max(0,sub.lessonsLeft-1);
       const ppl=sub.lessonsTotal>0?Math.round(sub.amount/sub.lessonsTotal):0;
       sub.amountLeft=Math.max(0,(sub.amountLeft!==undefined?sub.amountLeft:sub.amount)-ppl);
     }
     l.status='done';
   } else if(cur==='done'){
-    // restore subscription counter
-    if(sub){
+    // restore subscription counter only if was sub-deducted
+    if(sub&&!l.autoPaymentId&&!l.paid){
       sub.lessonsLeft=Math.min(sub.lessonsTotal||999,sub.lessonsLeft+1);
       const ppl=sub.lessonsTotal>0?Math.round(sub.amount/sub.lessonsTotal):0;
       sub.amountLeft=Math.min(sub.amount,(sub.amountLeft||0)+ppl);
@@ -621,14 +640,14 @@ function setLessonStatus(id,status){
   const l=state.lessons.find(x=>x.id===id);if(!l)return;
   const prev=l.status||'planned';
   const st=getStudent(l.studentId);const sub=st?getActiveSub(st.id):null;
-  // undo previous done: restore sub counter
-  if(prev==='done'&&status!=='done'&&sub){
+  // undo previous done: restore sub counter (only if not explicitly paid)
+  if(prev==='done'&&status!=='done'&&sub&&!l.autoPaymentId&&!l.paid){
     sub.lessonsLeft=Math.min(sub.lessonsTotal||999,sub.lessonsLeft+1);
     const ppl=sub.lessonsTotal>0?Math.round(sub.amount/sub.lessonsTotal):0;
     sub.amountLeft=Math.min(sub.amount,(sub.amountLeft||0)+ppl);
   }
-  // apply new done: deduct sub counter
-  if(status==='done'&&prev!=='done'&&sub){
+  // apply new done: deduct sub counter (only if not explicitly paid)
+  if(status==='done'&&prev!=='done'&&sub&&!l.autoPaymentId&&!l.paid){
     sub.lessonsLeft=Math.max(0,sub.lessonsLeft-1);
     const ppl=sub.lessonsTotal>0?Math.round(sub.amount/sub.lessonsTotal):0;
     sub.amountLeft=Math.max(0,(sub.amountLeft!==undefined?sub.amountLeft:sub.amount)-ppl);
@@ -789,15 +808,15 @@ function renderStudents(){
 }
 
 // ── BALANCE HELPER ────────────────────────────────────────
-// Balance = total paid - (done lessons × price per lesson)
-// Positive = student has credit (prepaid/subscription remaining)
-// Zero = all settled
-// Negative = student owes money
+// Balance = total paid - (unpaid done lessons × price)
+// "paid" lesson = has autoPaymentId (explicit payment record attached, even 0₴)
+// Subscription lessons count against balance via the sub payment record itself
 function calcBalance(studentId){
   const s=getStudent(studentId);if(!s)return 0;
   const totalPaid=state.payments.filter(p=>p.studentId===studentId&&p.status==='Оплачено').reduce((a,p)=>a+(p.amount||0),0);
-  const doneLessons=state.lessons.filter(l=>l.studentId===studentId&&l.status==='done').length;
-  return totalPaid - doneLessons*(s.price||0);
+  // Only count lessons NOT already covered by an explicit payment record
+  const unpaidDone=state.lessons.filter(l=>l.studentId===studentId&&l.status==='done'&&!l.autoPaymentId&&!l.paid).length;
+  return totalPaid - unpaidDone*(s.price||0);
 }
 
 function openStudentDetail(id){
